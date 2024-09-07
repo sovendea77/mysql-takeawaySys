@@ -18,10 +18,10 @@ import importlib
 importlib.reload(sys)
 
 app = Flask(__name__)
-mysql_pwd = "123456"
+mysql_pwd = "sovendea"
 db_name = "appDB"
 # 全局变量
-username = ""
+username = "sovendea"
 # TODO: username变量的赋值  方法1：全局变量实现，随登录进行修改  方法2：给每个页面传递username
 userRole = ""
 notFinishedNum = 0
@@ -57,7 +57,7 @@ def registerPage():
         print(userRole)
         print(username)
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB",charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB",charset='utf8')
 
         if userRole == 'RESTAURANT':
             cursor = db.cursor()
@@ -137,7 +137,7 @@ def logInPage():
         print(userRole)
         print(username)
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user=username, password=mysql_pwd, database="appDB", charset='utf8')
 
         if userRole == 'ADMIN':
             cursor = db.cursor()
@@ -212,7 +212,7 @@ def adminRestListPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -236,7 +236,7 @@ def adminRestListPage():
     elif request.form["action"] == "移除":
         RESTName = request.form.get('RESTName')
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -273,7 +273,7 @@ def adminUserPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -304,7 +304,7 @@ def adminOrder():
         new_status = request.form['new_status']
 
         # 连接数据库
-        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", database="appDB", charset='utf8')
         try:
             with db.cursor() as cursor:
                 # 更新数据库
@@ -325,7 +325,7 @@ def adminOrder():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -355,7 +355,7 @@ def adminCommentPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -377,7 +377,7 @@ def adminCommentPage():
             msg = "none"
             return render_template('adminCommentList.html', username=username, messages=msg)
     elif request.form["action"] == "按评分升序排列":
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -405,7 +405,7 @@ def UserRestListPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -437,7 +437,7 @@ def menu():
         print(restaurant)
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -459,7 +459,7 @@ def menu():
             msg = "none"
             return render_template('Menu.html', username=username, RESTAURANT=restaurant, messages=msg)
     elif request.form["action"] == "特色菜":
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -480,7 +480,7 @@ def menu():
             msg = "none"
         return render_template('Menu.html', username=username, RESTAURANT=restaurant, messages=msg)
     elif request.form["action"] == "按销量排序":
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="sovendea", password='sovendea', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -1473,36 +1473,6 @@ def Merchantindexpage():
 @app.route('/MerchantPersonal')
 def MpersonalPage():
     return render_template('MerchantPersonal.html')
-
-#展示商家个人信息页面
-@app.route('/MerchantViewPerInfo',methods=['GET', 'POST'])
-def MerchantViewPerInfo():
-    msg = ""
-    if request.method == 'GET':
-        msg = ""
-        # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="root", password="123456", database="appDB", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
-        # 查询
-        sql = "SELECT ShopID,ShopPassword,ShopAddress,ShopPhone,Shop.img_res from Shop where ShopID = '{}'" .format(username)
-
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        # print(res)
-        # print(len(res))
-        if len(res) != 0:
-            msg = "done"
-            print(msg)
-            print(len(res))
-            return render_template('MerchantViewPerInfo.html', username=username, result=res, messages=msg)
-        else:
-            print("NULL")
-            msg = "none"
-            return render_template('MerchantViewPerInfo.html', username=username, messages=msg)
 
 
 
