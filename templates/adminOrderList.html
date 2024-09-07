@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-    <title>买家用户界面</title>
+    <meta charset="UTF-8">
+    <title>待退款订单</title>
     <!-- <link rel="stylesheet" href="static/css/test.css" type="text/css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
@@ -33,67 +33,70 @@
 </head>
 <body>
 	<div class="gtco-loader"></div>
-
 	<div id="page">
-		<header>
-		<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<ul class="nav navbar-nav">
-						<li><a href="UserRestList">商家列表</a></li>
-					</ul>
-				</div>
-				<div class="collapse navbar-collapse navbar-right" id="navbar-collapse">
-					<ul class="nav navbar-nav">
-						<li><a href="index">退出登录</a></li>
-						<li><a href="personal">个人中心</a></li>&nbsp;
-                        <li><a href="myOrder">购物车</a></li>
-					</ul>
-				</div>
-			</div>
-
-		</nav>
-		</header>
-
+		<div class="navbkg" >
+			<nav class="gtco-nav" role="navigation" style="background-color: rgba(0, 0, 0, 0.8);">
+				<div class="gtco-container">
+					<div class="row">
+						<div class="col-sm-4 col-xs-12">
+							<div id="gtco-logo"><a href="adminOrderList">待退款订单<em></em></a></div>
+                		</div>
+						<div class="col-xs-8 text-right menu-1">
+							<ul>
+								<li><a href="adminCommentList">查看评论</a></li>
+								<li><a href="adminUserList">用户信息</a></li>
+								<li><a href="adminDeliList">外卖员信息</a></li>
+								<li><a href="adminRestList">商家列表</a></li>
+								<li><a href="index">退出登录</a></li>
+                    		</ul>
+                		</div>
+            		</div>
+        		</div>
+			</nav>
+		</div>
 	<div class="gtco-section">
 		<div class="gtco-container">
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<h2 class="cursive-font primary-color">Restaurant List</h2>
+					<h2 class="cursive-font primary-color">待退款订单</h2>
 				</div>
 			</div>
 			<div class="row">
-					{% if messages == "done" %}
-						{% for item in result %}
-					<div class="col-lg-6 col-md-6 col-sm-6">
+				{% if messages == "done" %}
+					{% for item in result %}
+						<div class="col-lg-6 col-md-6 col-sm-6">
 							<div class="fh5co-card-item">
-								<a href="{{ item[5] }}" class="fh5co-card-item image-popup">
+								<a href="{{ item[4] }}" class="fh5co-card-item image-popup">
 								<figure>
 									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src={{item[5]}}  alt="Image" class="img-responsive">
+									<img src="{{ item[4] }}" alt="Image" class="img-responsive">
 								</figure>
 								</a>
 								<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
 									<h2 class="cursive-font primary-color" style="font-weight: bold;">{{ item[0] }}</h2>
 									<h3 class="cursive-font primary-color">ADDRESS：{{ item[2] }}</h3>
 									<h3 class="cursive-font primary-color">PHONE：{{ item[3] }}</h3>
+
+									<form action="{{ url_for('adminOrder') }}" method="post">
+        <input type="hidden" name="order_id" value="{{item[0]}}"> <!-- 假设我们要更新的订单ID是1 -->
+        <input type="hidden" name="new_status" value="completed"> <!-- 假设我们要将状态更新为completed -->
+        <button type="submit">退款</button>
+    </form>
+
 								</div>
-								<form action ="{{url_for('menu')}}" method = "POST">
-									<input name = "restaurant" value="{{item[0]}}" style = "display:none;">
-									<input type = "submit" name = "action" value = "进入本店" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
-								</form>
-								<form action ="{{url_for('resComment')}}" method = "POST">
-									<input name = "restaurant" value="{{item[0]}}" style = "display:none;">
-									<input type = "submit" name = "action" value = "查看评价" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+								<form action="{{ url_for('adminRestListPage') }}" method="post">
+									<input name="RESTName" value="{{ item[0] }}" style="display: none;">
+									<input type="submit" name="action" value="移除" style="margin: 8px; font-size: 20px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
 								</form>
 							</div>
-					</div>
+						</div>
 						{% endfor %}
-					{% elif messages == "none" %}
-						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
-						<div class="alert alert-danger" role="alert">暂无商家</div>
-					{% endif %}
+				{% elif messages == "none" %}
+					<div class="alert alert-danger" role="alert">暂无商家</div>
+				{% elif messages == "delete" %}
+					<script>alert("移除成功！")</script>
+					<script type='text/javascript'>window.location.href='adminRestList'</script>
+				{% endif %}
 
 
 			</div>
@@ -101,33 +104,6 @@
 		</div>
 	</div>
 	</div>
-
-	<footer id="gtco-footer" role="contentinfo" style="background-image: url(static/images/img_bg_1.jpg)" data-stellar-background-ratio="0.5">
-		<div class="overlay"></div>
-		<div class="gtco-container">
-			<div class="row row-pb-md">
-
-				<div class="col-md-12 text-center">
-					<div class="gtco-widget">
-						<h3>社区分享</h3>
-						<ul class="gtco-social-icons">
-							<li><a href="#"><i class="icon-twitter"></i></a></li>
-							<li><a href="#"><i class="icon-facebook"></i></a></li>
-							<li><a href="#"><i class="icon-linkedin"></i></a></li>
-							<li><a href="#"><i class="icon-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="col-md-12 text-center copyright">
-					<p><big class="block">&copy; 2020 ZhangHongYu SWPU数据库原理及应用大作业</big>
-				</div>
-
-			</div>
-
-		</div>
-	</footer>
-
 	<!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
 	<!-- jQuery Easing -->
@@ -155,5 +131,4 @@
 	<!-- Main -->
 	<script src="static/js/main.js"></script>
 </body>
-
 </html>

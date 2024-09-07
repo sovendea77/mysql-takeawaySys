@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-    <title>买家用户界面</title>
+    <meta charset="UTF-8">
+    <title>结算确认</title>
     <!-- <link rel="stylesheet" href="static/css/test.css" type="text/css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
@@ -30,79 +30,106 @@
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	<script src="static/js/modernizr-2.6.2.min.js"></script>
+    <style>
+        /* 基本布局和样式 */
+       .orders-list {
+           width: 80%;
+           margin: 20px auto;
+           padding: 20px;
+           border: 1px solid #ccc;
+           border-radius: 8px;
+           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+       }
+
+       .orders-list h2 {
+           text-align: center;
+           color: #333;
+       }
+
+       .orders-list ul {
+           list-style: none;
+           padding: 0;
+       }
+
+       .order-details p {
+           margin: 8px 0;
+           color: #666;
+       }
+
+       .action-buttons {
+           text-align: right;
+           margin-top: 10px;
+       }
+
+       .confirm-button {
+           padding: 8px 16px;
+           background-color: #007bff;
+           color: white;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+           transition: background-color 0.3s;
+       }
+
+       .confirm-button:hover {
+           background-color: #0056b3;
+       }
+    </style>
 </head>
 <body>
-	<div class="gtco-loader"></div>
+    <div class="gtco-loader"></div>
+    <div id="page">
+        <div class="navbkg" >
+			<nav class="gtco-nav" role="navigation" style="background-color: rgba(0, 0, 0, 0.8);">
+				<div class="gtco-container">
+					<div class="row">
+						<div class="col-sm-4 col-xs-12">
+							<div id="gtco-logo"><a href="adminRestList">订单详情<em></em></a></div>
+                		</div>
 
-	<div id="page">
-		<header>
-		<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<ul class="nav navbar-nav">
-						<li><a href="UserRestList">商家列表</a></li>
-					</ul>
-				</div>
-				<div class="collapse navbar-collapse navbar-right" id="navbar-collapse">
-					<ul class="nav navbar-nav">
-						<li><a href="index">退出登录</a></li>
-						<li><a href="personal">个人中心</a></li>&nbsp;
-                        <li><a href="myOrder">购物车</a></li>
-					</ul>
-				</div>
-			</div>
-
-		</nav>
-		</header>
-
-	<div class="gtco-section">
+            		</div>
+        		</div>
+			</nav>
+		</div>
+        <div class="gtco-section">
 		<div class="gtco-container">
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<h2 class="cursive-font primary-color">Restaurant List</h2>
+					<h2 class="cursive-font primary-color">订单</h2>
 				</div>
 			</div>
-			<div class="row">
-					{% if messages == "done" %}
-						{% for item in result %}
-					<div class="col-lg-6 col-md-6 col-sm-6">
-							<div class="fh5co-card-item">
-								<a href="{{ item[5] }}" class="fh5co-card-item image-popup">
-								<figure>
-									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src={{item[5]}}  alt="Image" class="img-responsive">
-								</figure>
-								</a>
-								<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-									<h2 class="cursive-font primary-color" style="font-weight: bold;">{{ item[0] }}</h2>
-									<h3 class="cursive-font primary-color">ADDRESS：{{ item[2] }}</h3>
-									<h3 class="cursive-font primary-color">PHONE：{{ item[3] }}</h3>
-								</div>
-								<form action ="{{url_for('menu')}}" method = "POST">
-									<input name = "restaurant" value="{{item[0]}}" style = "display:none;">
-									<input type = "submit" name = "action" value = "进入本店" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
-								</form>
-								<form action ="{{url_for('resComment')}}" method = "POST">
-									<input name = "restaurant" value="{{item[0]}}" style = "display:none;">
-									<input type = "submit" name = "action" value = "查看评价" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
-								</form>
-							</div>
-					</div>
-						{% endfor %}
-					{% elif messages == "none" %}
-						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
-						<div class="alert alert-danger" role="alert">暂无商家</div>
-					{% endif %}
-
-
-			</div>
-
 		</div>
 	</div>
-	</div>
 
-	<footer id="gtco-footer" role="contentinfo" style="background-image: url(static/images/img_bg_1.jpg)" data-stellar-background-ratio="0.5">
+        <div class="orders-list">
+    <h2>未完成订单</h2>
+    <ul>
+        <li>
+            <div class="order-details">
+                <p>订单号：</p >
+
+                <div class="orders-list">
+                    <p>菜品：</p >
+                    <br>
+                    <ul>
+
+                        <li>
+                            <div class="order-details">
+                                <p> ordersdisher.imgsrc </p >
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <p>总价： orders.ActualPayment 元</p >
+            </div>
+        </li>
+    </ul>
+    </div>
+
+    </div>
+    <footer id="gtco-footer" role="contentinfo" style="background-image: url(static/images/img_bg_1.jpg)" data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>
 		<div class="gtco-container">
 			<div class="row row-pb-md">
@@ -127,8 +154,7 @@
 
 		</div>
 	</footer>
-
-	<!-- jQuery -->
+    <!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
 	<!-- jQuery Easing -->
 	<script src="static/js/jquery.easing.1.3.js"></script>
@@ -155,5 +181,4 @@
 	<!-- Main -->
 	<script src="static/js/main.js"></script>
 </body>
-
 </html>
