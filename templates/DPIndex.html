@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-    <title>管理员界面</title>
+    <title>外卖员用户界面</title>
     <!-- <link rel="stylesheet" href="static/css/test.css" type="text/css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
@@ -35,64 +35,80 @@
 	<div class="gtco-loader"></div>
 
 	<div id="page">
-		<div class="navbkg" >
-			<nav class="gtco-nav" role="navigation" style="background-color: rgba(0, 0, 0, 0.8);">
-				<div class="gtco-container">
-					<div class="row">
-						<div class="col-sm-4 col-xs-12">
-							<div id="gtco-logo"><a href="adminRestList">商家列表<em></em></a></div>
-                		</div>
-						<div class="col-xs-8 text-right menu-1">
-							<ul>
-								<li><a href="adminCommentList">查看评论</a></li>
-								<li><a href="index">退出登录</a></li>
-                    		</ul>
-                		</div>
-            		</div>
-        		</div>
-			</nav>
-		</div>
+		<header>
+		<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<ul class="nav navbar-nav">
+						<li><a href="UserRestList">订单列表</a></li>
+					</ul>
+				</div>
+				<div class="collapse navbar-collapse navbar-right" id="navbar-collapse">
+					<ul class="nav navbar-nav">
+						<li><a href="index">退出登录</a></li>
+						<li><a href="DPpersonal">个人中心</a></li>&nbsp;
+					</ul>
+				</div>
+			</div>
+
+		</nav>
+		</header>
 
 	<div class="gtco-section">
 		<div class="gtco-container">
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<h2 class="cursive-font primary-color">Restaurant List</h2>
-					<p>查看评论后可移除恶意营销商家</p>
+					<h2 class="cursive-font primary-color">Current Orders</h2>
 				</div>
 			</div>
 			<div class="row">
-				{% if messages == "done" %}
-					{% for item in result %}
-						<div class="col-lg-6 col-md-6 col-sm-6">
+				<div class="col-lg-12 col-md-4 col-sm-6">
+					{% if messages == "done" %}
+						{% for item in result %}
 							<div class="fh5co-card-item">
-								<a href="{{ item[4] }}" class="fh5co-card-item image-popup">
-								<figure>
+								<figure class="col-lg-4" style="float: left;">
 									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src="{{ item[4] }}" alt="Image" class="img-responsive">
+									<img src={{item[8]}} alt="Image" class="img-responsive">
 								</figure>
-								</a>
-								<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-									<h2 class="cursive-font primary-color" style="font-weight: bold;">{{ item[0] }}</h2>
-									<h3 class="cursive-font primary-color">ADDRESS：{{ item[2] }}</h3>
-									<h3 class="cursive-font primary-color">PHONE：{{ item[3] }}</h3>
+								<div class="fh5co-text">
+									<h2 style="margin-top: 40px;"> 订单号：{{ item[0] }} </h2>
+									<p>店铺：{{ item[4] }}</p>
+									<p>用户：{{ item[5] }}</p>
+
+									{% if item[9] is none %}
+										<p>取餐时间：{{ item[10] }}</p>
+										<p>订单状态：<span style="color: red;">未完成</span></p>
+									{% elif item[9] is not none %}
+										<p>取餐时间：{{ item[10] }}</p>
+										<p>订单状态：<span style="color: red;">已完成</span></p>
+									{% endif %}
+
+
+									<p style="margin-left: 322px;">订单总价格：<span class="price cursive-font">￥{{ item[2]}}</span></p>
+
+									<form action="{{ url_for('DPIndexPage') }}" method="post">
+										<input name="orderID" value={{ item[0] }} style="display: none;">
+										{% if item[9] is none %}
+                                            <input type="submit" name="action" value="订单送达" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+                                        {% endif %}
+									</form>
+                                    <br/>
 								</div>
-								<form action="{{ url_for('adminRestListPage') }}" method="post">
-									<input name="RESTName" value="{{ item[0] }}" style="display: none;">
-									<input type="submit" name="action" value="移除" style="margin: 8px; font-size: 20px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
-								</form>
 							</div>
-						</div>
 						{% endfor %}
-				{% elif messages == "none" %}
-					<div class="alert alert-danger" role="alert">暂无商家</div>
-				{% elif messages == "delete" %}
-					<script>alert("移除成功！")</script>
-					<script type='text/javascript'>window.location.href='adminRestList'</script>
-				{% endif %}
+					<!-- TODO -->
+					{% elif messages == "UpdateSucceed" %}
+					<script>alert("确认订单送达！")</script>
+					<script type='text/javascript'>window.location.href='WriteComments'</script>
 
 
-			</div>
+					{% elif messages == "none" %}
+						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
+						<div class="alert alert-danger" role="alert">您还没有未完成订单哦！</div>
+					{% endif %}
+
+				</div>
 
 		</div>
 	</div>

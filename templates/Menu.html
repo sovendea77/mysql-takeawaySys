@@ -40,7 +40,7 @@
                     <ul>
                         <li><a href="UserRestList">商家列表</a></li>
 						<li><a href="ResComment">商家评价</a></li>
-						<li><a href="settlement">购物车</a></li>
+						<li><a href="myOrder">购物车</a></li>
 						<li class="has-dropdown">
                             <a href="personal">个人中心</a>
                             <ul class="dropdown">
@@ -95,7 +95,7 @@
 									<p>营养成分：{{ item[3] }}</p>
                                     <p>销量：{{item[5] }}</p>
 									<p style="margin-left: 322px;">价格：<span class="price cursive-font">￥{{ item[4]}}</span></p>
-									<form action="{{ url_for('shopping') }}" method="POST">
+									<form action="{{ url_for('shoppingCartPage') }}" method="POST">
 										<input name="restaurant" value="{{ item[1] }}" style="display: none;">
                                         <input name="dishname" value="{{ item[0] }}" style="display: none;">
                                         <input name="price" value="{{ item[4] }}" style="display: none;">

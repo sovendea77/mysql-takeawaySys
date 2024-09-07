@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>菜单界面</title>
-	<link rel="stylesheet" href="static/css/OrderPage.css">
+    <title>个人中心</title>
+    <link rel="stylesheet" href="static/css/personal.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="static/js/modernizr-2.6.2.min.js"></script>
 
@@ -26,7 +26,6 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
 
-
 </head>
 <body>
 	<div class="navbkg" >
@@ -34,67 +33,68 @@
         <div class="gtco-container">
             <div class="row">
                 <div class="col-sm-4 col-xs-12">
-                    <div id="gtco-logo"><a href="MerchantMenu">个人信息<em></em></a></div>
+                    <div id="gtco-logo"><a href="index.html">个人中心<em></em></a></div>
                 </div>
                 <div class="col-xs-8 text-right menu-1">
                     <ul>
                         <li class="has-dropdown">
-                            <a href="MerchantIndex">其他功能</a>
+                            <a href="DPpersonal">个人中心</a>
                             <ul class="dropdown">
-								<li><a href="MerchantModifyPerInfo">修改个人信息</a></li>
-								<li><a href="MerchantModifyPwd">修改密码</a></li>
-                                <li><a href="ResCommentList">查看评论</a></li>
-                                <li><a href="MerchantOrderPage">查看订单</a></li>
-
+								<li><a href="ModifyPersonalInfo">修改个人信息</a></li>
+								<li><a href="ModifyPassword">修改密码</a></li>
+                                <li><a href="OrderPage">我的订单</a></li>
                             </ul>
 						</li>
-                        <li><a href="MerchantIndex">返回首页</a></li>
-                    </ul>
+						<li><a href="index">返回首页</a></li>
+                    </ul>	
                 </div>
             </div>
         </div>
-	</nav>
+	</nav>  
 	</div>
 
-	<div class="gtco-section">
-		<div class="gtco-container">
-			<!-- 文字 -->
-			<div class="row">
-				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<p style="font-size: 40px; color: #FBB448; font-family: Helvetica;">个人信息</p>
-					<!-- <p>Dignissimos asperiores vitae velit veniam totam fuga molestias accusamus alias autem provident. Odit ab aliquam dolor eius.</p> -->
-				</div>
-			</div>
-
-			<br/><br/>
-			<!-- 展示我的全部订单 -->
-			<div class="row">
-				<div class="col-lg-12 col-md-4 col-sm-6">
-					{% if messages == "done" %}
-						{% for item in result %}
-							<div class="fh5co-card-item">
-								<figure class="col-lg-4" style="float: left;">
-									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src={{item[4]}} alt="Image" class="img-responsive">
-								</figure>
-								<div class="fh5co-text">
-									<h2 style="margin-top: 40px;"> 店铺名：{{ item[0] }} </h2>
-									<p>店铺地址：{{ item[2] }}</p>
-									<p>电话：{{ item[3] }}</p>
-
-                                    <br/>
-								</div>
-							</div>
-						{% endfor %}
-					<!-- TODO -->
-
-
-				</div>
-
+	<div id="gtco-features">
+	<div class="gtco-container">
+	<div class="row" style="margin-top: 70px; background-color: #FBB448;">
+		<div class="col-md-4 col-sm-6" >
+			<div class="feature-center animate-box" data-animate-effect="fadeIn">
+				<span class="icon">
+					<i class="ti-settings"></i>
+				</span>
+				<a href="ModifyPersonalInfo" style="text-decoration: none;"><h3>修改个人信息</h3></a>
+				<p>Modify personal information</p>
 			</div>
 		</div>
+		<div class="col-md-4 col-sm-6">
+			<div class="feature-center animate-box" data-animate-effect="fadeIn">
+				<span class="icon">
+					<i class="ti-lock"></i>
+				</span>
+				<a href="ModifyPassword" style="text-decoration: none;"><h3>修改密码</h3></a>
+				<p>Modify my password</p>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<div class="feature-center animate-box" data-animate-effect="fadeIn">
+				<span class="icon">
+					<i class="ti-receipt"></i>
+				</span>
+				<a href="OrderPage" style="text-decoration: none;"><h3>我的订单</h3></a>
+				<p>My orders</p>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<div class="feature-center animate-box" data-animate-effect="fadeIn">
+				<span class="icon">
+					<i class="ti-comment-alt"></i>
+				</span>
+				<input type="radio" name="order" value="MyComments"><a href="MyComments">开始接单</a>
+				<p>Order Receiving</p>
+			</div>
+		</div>
+
 	</div>
-	<div>
+	</div>
 	</div>
 
 
@@ -117,7 +117,7 @@
 	<!-- Magnific Popup -->
 	<script src="static/js/jquery.magnific-popup.min.js"></script>
 	<script src="static/js/magnific-popup-options.js"></script>
-
+	
 	<script src="static/js/moment.min.js"></script>
 	<script src="static/js/bootstrap-datetimepicker.min.js"></script>
 
