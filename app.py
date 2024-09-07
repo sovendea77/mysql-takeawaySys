@@ -96,7 +96,7 @@ def registerPage():
                 cursor.execute("use appDB")
             except:
                 print("Error: unable to use database!")
-            sql1 = "SELECT * from Users where username = '{}'".format(username)
+            sql1 = "SELECT * from Users where UserID = '{}'".format(username)
             cursor.execute(sql1)
             db.commit()
             res1 = cursor.fetchall()
@@ -114,6 +114,37 @@ def registerPage():
                     cursor.execute(sql2)
                     db.commit()
                     print("商家注册成功")
+                    msg = "done2"
+                except ValueError as e:
+                    print("--->", e)
+                    print("注册出错，失败")
+                    msg = "fail2"
+            return render_template('Register.html', messages=msg, username=username, userRole=userRole)
+
+        elif userRole == 'DeliveryPerson':
+            cursor = db.cursor()
+            try:
+                cursor.execute("use appDB")
+            except:
+                print("Error: unable to use database!")
+            sql1 = "SELECT * from DeliveryPersons where DeliveryPersonID = '{}'".format(username)
+            cursor.execute(sql1)
+            db.commit()
+            res1 = cursor.fetchall()
+            num = 0
+            for row in res1:
+                num = num + 1
+            # 如果已存在该用户
+            if num == 1:
+                print("用户已注册！请直接登录。")
+                msg = "fail2"
+            else:
+                sql2 = "insert into DeliveryPersons (DeliveryPersonID, DeliveryPersonPassword,  DeliveryPersonPos, DeliveryPersonPhone) values ('{}', '{}', '{}', '{}') ".format(username, password, addr, phone)
+
+                try:
+                    cursor.execute(sql2)
+                    db.commit()
+                    print("外卖员注册成功")
                     msg = "done2"
                 except ValueError as e:
                     print("--->", e)
@@ -204,6 +235,30 @@ def logInPage():
                 print("您没有用户权限，未注册或登录信息出错。")
                 msg = "fail3"
             return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
+
+        elif userRole == 'DeliveryPerson':
+            cursor = db.cursor()
+            try:
+                cursor.execute("use appDB")
+            except:
+                print("Error: unable to use database!")
+            sql = "SELECT * from DeliveryPersons where DeliveryPersonID = '{}' and DeliveryPersonPassword='{}'".format(
+                username, password)
+            cursor.execute(sql)
+            db.commit()
+            res = cursor.fetchall()
+            num = 0
+            for row in res:
+                num = num + 1
+            # 如果存在该外卖员且密码正确
+            if num == 1:
+                print("登录成功！欢迎外卖员用户！")
+                msg = "done4"
+            else:
+                print("您没有用户权限，未注册或登录信息出错。。")
+                msg = "fail4"
+            return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
+
 
 # 管理员的店铺列表页面
 @app.route('/adminRestList', methods=['GET', 'POST'])
@@ -1145,7 +1200,7 @@ def wallet():
     msg = ""
     if request.method == 'GET':
         # 连接数据库
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="Test2", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         # 创建一个游标对象
         cursor = db.cursor()
         try:
@@ -1163,7 +1218,7 @@ def wallet():
 
     if request.method == 'POST':
         # 连接数据库
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="Test2", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         # 创建游标对象
         cursor = db.cursor()
         # 获取用户的充值金额
@@ -1412,7 +1467,7 @@ def DPIndexPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="test2", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -1434,7 +1489,7 @@ def DPIndexPage():
             return render_template('DPIndex.html', username=username, messages=msg)
 
     elif request.method == 'POST' and request.form.get("action") == "订单送达":
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="test2", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
