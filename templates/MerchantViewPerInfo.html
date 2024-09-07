@@ -34,23 +34,21 @@
         <div class="gtco-container">
             <div class="row">
                 <div class="col-sm-4 col-xs-12">
-                    <div id="gtco-logo"><a href="Menu.html">商家菜单<em></em></a></div>
+                    <div id="gtco-logo"><a href="MerchantMenu">个人信息<em></em></a></div>
                 </div>
                 <div class="col-xs-8 text-right menu-1">
                     <ul>
-                        <li><a href="UserRestList">商家列表</a></li>
-						<li><a href="ResComment">商家评价</a></li>
-						<li><a href="settlement">购物车</a></li>
-						<li class="has-dropdown">
-                            <a href="personal">个人中心</a>
+                        <li class="has-dropdown">
+                            <a href="MerchantIndex">其他功能</a>
                             <ul class="dropdown">
-								<li><a href="ModifyPersonalInfo">修改个人信息</a></li>
-								<li><a href="ModifyPassword">修改密码</a></li>
-                                <li><a href="OrderPage">我的订单</a></li>
-                                <li><a href="MyComments">我的评价</a></li>
-                                <li><a href="WriteComments">发表评价</a></li>
+								<li><a href="MerchantModifyPerInfo">修改个人信息</a></li>
+								<li><a href="MerchantModifyPwd">修改密码</a></li>
+                                <li><a href="ResCommentList">查看评论</a></li>
+                                <li><a href="MerchantOrderPage">查看订单</a></li>
+
                             </ul>
 						</li>
+                        <li><a href="MerchantIndex">返回首页</a></li>
                     </ul>
                 </div>
             </div>
@@ -63,18 +61,11 @@
 			<!-- 文字 -->
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<p style="font-size: 40px; color: #FBB448; font-family: Helvetica; font-weight: bold;">今日菜单</p>
+					<p style="font-size: 40px; color: #FBB448; font-family: Helvetica;">个人信息</p>
 					<!-- <p>Dignissimos asperiores vitae velit veniam totam fuga molestias accusamus alias autem provident. Odit ab aliquam dolor eius.</p> -->
 				</div>
 			</div>
-			<!-- TODO: 此处还想加一个按照时间顺序或价格排列 -->
-			<div class="selectcondition">
-				<form action="{{ url_for('menu') }}" method="post">
-					<input type="submit" name="action" value="特色菜" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<input type="submit" name="action" value="按销量排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-				</form>
-			</div>
+
 			<br/><br/>
 			<!-- 展示我的全部订单 -->
 			<div class="row">
@@ -84,40 +75,36 @@
 							<div class="fh5co-card-item">
 								<figure class="col-lg-4" style="float: left;">
 									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src={{item[6]}} alt="Image" class="img-responsive">
+									<img src={{item[4]}} alt="Image" class="img-responsive">
 								</figure>
 								<div class="fh5co-text">
-                                    {% if item[7] == 1 %}
-                                    <h1 style="margin-top: 0px;">特色菜</h1>
-                                    {% endif %}
-									<h2 style="margin-top: 40px; font-weight: bold;"> 菜品：{{ item[0] }} </h2>
-									<p>菜品描述：{{ item[2] }}</p>
-									<p>营养成分：{{ item[3] }}</p>
-                                    <p>销量：{{item[5] }}</p>
-									<p style="margin-left: 322px;">价格：<span class="price cursive-font">￥{{ item[4]}}</span></p>
-									<form action="{{ url_for('shopping') }}" method="POST">
-										<input name="restaurant" value="{{ item[1] }}" style="display: none;">
-                                        <input name="dishname" value="{{ item[0] }}" style="display: none;">
-                                        <input name="price" value="{{ item[4] }}" style="display: none;">
-                                        <input name="img_res" value="{{ item[6] }}" style="display: none;">
-                                        <input type="submit" name="action" value="加入购物车" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+									<h2 style="margin-top: 40px;"> 店铺名：{{ item[0] }} </h2>
+									<p>店铺地址：{{ item[2] }}</p>
+									<p>电话：{{ item[3] }}</p>
 
-                                    </form>
                                     <br/>
 								</div>
 							</div>
 						{% endfor %}
 					<!-- TODO -->
 
+
 					{% elif messages == "none" %}
 						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
-						<div class="alert alert-danger" role="alert">店铺信息尚不完善！</div>
-					{% elif messages == "fail" %}
-						<script>alert("该菜品已经存在于购物车中！")</script>
+						<div class="alert alert-danger" role="alert">您还没有菜单哦！</div>
 					{% endif %}
 
-				</div>
+                    {% if dmessages == "done" %}
+                        <script>alert("删除菜品"+"{{dishname}}"+"成功")</script>
+                        <script language="javascript" type="text/javascript">
+                            // 以下方式定时跳转
+                            setTimeout("javascript:location.href='MerchantMenu'", 1);
+                        </script>
+                    {% elif dmessages == "fail" %}
+                        <script>alert("数据库错误！")</script>
+                    {% endif %}
 
+				</div>
 
 			</div>
 		</div>

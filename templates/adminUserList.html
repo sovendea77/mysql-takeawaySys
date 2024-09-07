@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-    <title>管理员界面</title>
+    <meta charset="UTF-8">
+    <title>查看用户</title>
     <!-- <link rel="stylesheet" href="static/css/test.css" type="text/css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
@@ -40,12 +40,12 @@
 				<div class="gtco-container">
 					<div class="row">
 						<div class="col-sm-4 col-xs-12">
-							<div id="gtco-logo"><a href="adminRestList">商家列表<em></em></a></div>
+							<div id="gtco-logo"><a href="adminUserList">用户信息<em></em></a></div>
                 		</div>
 						<div class="col-xs-8 text-right menu-1">
 							<ul>
 								<li><a href="adminCommentList">查看评论</a></li>
-								<li><a href="adminUserList">用户信息</a></li>
+								<li><a href="adminRestList">商家列表</a></li>
 								<li><a href="adminDeliList">外卖员信息</a></li>
 								<li><a href="adminOrderList">待退款订单</a></li>
 								<li><a href="index">退出登录</a></li>
@@ -60,33 +60,41 @@
 		<div class="gtco-container">
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<h2 class="cursive-font primary-color">商家信息</h2>
-
+					<h2 class="cursive-font primary-color">用户信息</h2>
 				</div>
 			</div>
-			<div class="row">
+			<div >
 				{% if messages == "done" %}
-					{% for item in result %}
-						<div class="col-lg-6 col-md-6 col-sm-6">
-							<div class="fh5co-card-item">
-								<a href="{{ item[4] }}" class="fh5co-card-item image-popup">
-								<figure>
-									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src="{{ item[4] }}" alt="Image" class="img-responsive">
-								</figure>
-								</a>
-								<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-									<h2 class="cursive-font primary-color" style="font-weight: bold;">{{ item[0] }}</h2>
-									<h3 class="cursive-font primary-color">ADDRESS：{{ item[2] }}</h3>
-									<h3 class="cursive-font primary-color">PHONE：{{ item[3] }}</h3>
-								</div>
-								<form action="{{ url_for('adminRestListPage') }}" method="post">
-									<input name="RESTName" value="{{ item[0] }}" style="display: none;">
-									<input type="submit" name="action" value="移除" style="margin: 8px; font-size: 20px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
-								</form>
-							</div>
-						</div>
-						{% endfor %}
+				<table>
+    <thead>
+        <tr>
+            <th style="width:200px;">商店名</th>
+            <th style="width:200px;">密码</th>
+            <th style="width:200px;">地址</th>
+            <th style="width:400px;">联系电话</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in result %}
+        <tr>
+            <td style="width:200px;">
+                {{ item[0] }}
+            </td>
+            <td style="width:200px;">
+                {{ item[1] }}
+            </td>
+            <td style="width:200px;">
+                {{ item[2] }}
+            </td>
+            <td style="width:400px;">
+                {{ item[3] }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
 				{% elif messages == "none" %}
 					<div class="alert alert-danger" role="alert">暂无商家</div>
 				{% elif messages == "delete" %}
@@ -154,5 +162,4 @@
 	<!-- Main -->
 	<script src="static/js/main.js"></script>
 </body>
-
 </html>
