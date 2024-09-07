@@ -78,8 +78,7 @@
 														<label for="activities">身份</label><br>
 														<input type="radio" name="userRole" value="ADMIN" />管理员
     													<input type="radio" name="userRole" value="RESTAURANT" />商家用户
-														<input type="radio" name="userRole" value="CUSTOMER" checked />买家用户
-														<input type="radio" name="userRole" value="DeliveryPerson" />外卖员用户<br>
+														<input type="radio" name="userRole" value="CUSTOMER" checked />买家用户<br>
 													</div>
 												</div>
 												<div class="row form-group">
@@ -119,11 +118,6 @@
 												<script>alert("登录成功！欢迎买家用户！")</script>
 												<script type='text/javascript'>window.location.href='UserRestList'</script>
 											{% elif messages == "fail3" %}
-                                                <script>alert("登录失败！您尚未注册或登录信息出错。")</script>
-											{% elif messages == "done4" %}
-												<script>alert("登录成功！欢迎外卖员用户！")</script>
-												<script type='text/javascript'>window.location.href='DPIndex'</script>
-											{% elif messages == "fail4" %}
                                                 <script>alert("登录失败！您尚未注册或登录信息出错。")</script>
 											{% endif %}
 										</div>
