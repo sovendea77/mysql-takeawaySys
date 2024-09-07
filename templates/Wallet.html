@@ -75,17 +75,18 @@
 											<form action="" method="POST" enctype="multipart/form-data">
 												<div class="row form-group">
 													<div class="col-md-12">
-														<p>我的余额：{{balance}}</p>
+														<p>我的余额：{{money}}</p>
 													</div>
 												</div>
 												<div class="row form-group">
 													<div class="col-md-12">
 														<label for="rechargeAmount">充值</label>
-														<input type="number" id="rechargeAmount" class="form-control" placeholder="请输入充值金额" style="background-color:black;" />
-														<button type="button" class="btn btn-primary">充值</button>
+														<input type="number" name="rechargeAmount" id="rechargeAmount" class="form-control" placeholder="请输入充值金额" style="background-color:black;" />
+														<button type="submit" class="btn btn-primary">充值</button>
 													</div>
 												</div>
 											</form>
+											<a href="http://localhost:63342/app.py/templates/QQ.html" target="_blank">充值失败？点击这里申诉</a>
 										</div>
 
 

@@ -65,9 +65,16 @@
 					<!-- <p>Dignissimos asperiores vitae velit veniam totam fuga molestias accusamus alias autem provident. Odit ab aliquam dolor eius.</p> -->
 				</div>
 			</div>
-
+			<!-- TODO: 此处还想加一个按照时间顺序或价格排列 -->
+			<div class="selectcondition">
+				<form action="{{ url_for('MerchantOrderPage') }}" method="post">
+					<input type="submit" name="action" value="按时间排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
+					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
+					<span class="badge" style="float: right;">{{ notFinishedNum }}</span><input type="submit" name="action" value="未完成订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
+				</form>
+			</div>
 			<br/><br/>
-			<!-- 展示我的全部订单 -->
+					<!-- 展示我的全部订单 -->
 
 			<div class="orders-list">
 	        	<h2>已完成订单</h2>
@@ -109,6 +116,7 @@
 	</div>
 
 
+
     	<!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
 	<!-- jQuery Easing -->
@@ -137,15 +145,3 @@
 	<script src="static/js/main.js"></script>
 </body>
 </html>
-
-<style>
-    .order-details {
-        /* 可以添加一些内边距或外边距来调整布局 */
-        padding-bottom: 10px; /* 在订单详情和按钮之间添加一些空间 */
-    }
-
-    .confirm-button {
-        /* 你可以在这里设置按钮的样式，如宽度、内边距等 */
-        margin-top: 10px; /* 确保按钮与上面的内容有足够的空间 */
-    }
-</style>
