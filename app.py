@@ -463,7 +463,7 @@ def menu():
             msg = "none"
         return render_template('Menu.html', username=username, RESTAURANT=restaurant, messages=msg)
 
-#查看商家评论
+# 查看商家评论
 @app.route('/ResComment',methods=['GET','POST'])
 def resComment():
     msg = ""
@@ -495,7 +495,7 @@ def resComment():
             msg = "none"
         return render_template('ResComment.html', username=username, RESTAURANT=restaurant, messages=msg)
 
-#商家查看评论
+# 商家查看评论
 @app.route('/ResCommentList', methods=['GET', 'POST'])
 def ResCommentList():
     msg = ""
@@ -525,7 +525,7 @@ def ResCommentList():
         msg = "none"
     return render_template('ResCommentList.html', username=username, RESTAURANT=restaurant, messages=msg)
 
-#404跳转
+# 404跳转
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("404.html"), 404
@@ -687,6 +687,7 @@ def ModifyPassword():
             return render_template('ModifyPassword.html', messages=msg, username=username)
 
 
+# 用户订单页面
 @app.route('/OrderPage', methods=['GET', 'POST'])
 def OrderPage():
     msg = ""
@@ -820,6 +821,7 @@ def OrderPage():
         return render_template('OrderPage.html', username=username, messages=msg)
 
 
+# 我的评论页面
 @app.route('/MyComments', methods=['GET', 'POST'])
 def MyCommentsPage():
     msg = ""
@@ -927,6 +929,7 @@ def MyCommentsPage():
         return render_template('MyComments.html', username=username, messages=msg)
 
 
+# 写评论页面
 @app.route('/WriteComments', methods=['GET', 'POST'])
 def WriteCommentsPage():
     msg=""
@@ -1027,6 +1030,7 @@ def WriteCommentsPage():
         return render_template('WriteComments.html', username=username, messages=msg)
 
 
+# 用户评论页面
 @app.route('/CommentForm', methods=['GET', 'POST'])
 def CommentFormPage():
     msg = ""
@@ -1062,7 +1066,54 @@ def CommentFormPage():
             msg = "fail"
         return render_template('CommentForm.html', messages = msg, username=username)
 
-#商家查看菜品信息
+# 钱包（查看余额 充值钱包）
+@app.route('/Wallet', methods=['GET', 'POST'])
+def wallet():
+    msg = ""
+    if request.method == 'GET':
+        # 连接数据库
+        db = pymysql.connect(host="localhost", user="root", password="0158", database="Test2", charset='utf8')
+        # 创建一个游标对象
+        cursor = db.cursor()
+        try:
+            # 使用参数化查询防止 SQL 注入
+            sql = "SELECT money FROM users WHERE userID = %s"
+            cursor.execute(sql, (username,))
+            # 获取查询结果
+            result = cursor.fetchone()
+            money = result[0]  # 打印查询到的 username
+        finally:
+            # 关闭游标和数据库连接
+            cursor.close()
+            db.close()
+        return render_template('Wallet.html', username=username, money=money)
+
+    if request.method == 'POST':
+        # 连接数据库
+        db = pymysql.connect(host="localhost", user="root", password="0158", database="Test2", charset='utf8')
+        # 创建游标对象
+        cursor = db.cursor()
+        # 获取用户的充值金额
+        recharge_amount = request.form.get('rechargeAmount')
+        print(f"收到的充值金额为: {recharge_amount}")
+        with cursor as cursor:
+            # 调用存储过程
+            cursor.callproc("recharge", (recharge_amount, username))
+            db.commit()
+            try:
+                # 更新余额
+                sql = "SELECT money FROM users WHERE userID = %s"
+                cursor.execute(sql, (username,))
+                result = cursor.fetchone()
+                money = result[0]
+            finally:
+                sql_test = "select money from users where userid = {}".format(username)
+                db.close()
+
+        return render_template('Wallet.html', username=username, money=money)
+
+
+# 商家查看菜品信息
 @app.route('/MerchantMenu',methods=['GET', 'POST'])
 def MerchantMenu():
     msg = ""
@@ -1157,7 +1208,8 @@ def MerchantMenu():
                 msg = "none"
             return render_template('MerchantMenu.html', username=username,messages=msg)
 
-#商家修改菜品信息
+
+# 商家修改菜品信息
 @app.route('/MenuModify', methods=['GET', 'POST'])
 def MenuModify():
     msg = ""
@@ -1175,8 +1227,7 @@ def MenuModify():
         print(dishname)
         print(isSpecialty)
         print(type(isSpecialty))
-        
-		
+
         return render_template('MenuModify.html', dishname=dishname, rest=rest, dishinfo=dishinfo, nutriention=nutriention, price=price, username=username, messages=msg,isSpecialty=isSpecialty)
     elif request.form["action"] == "提交修改":
 
@@ -1196,8 +1247,7 @@ def MenuModify():
         if filename != '':
             f.save('static/images/' + filename)
         imgsrc = 'static/images/' + filename
-		
-		
+
         print(isSpecialty)
         print(type(isSpecialty))
         db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
@@ -1223,6 +1273,9 @@ def MenuModify():
             print("菜品信息修改失败失败")
             msg = "fail"
         return render_template('MenuModify.html',dishname=dishname, rest=rest, username=username, messages=msg)
+
+
+# 商家增加菜单
 @app.route('/MenuAdd',methods=['GET','POST'])
 def MenuAdd():
     msg = ""
@@ -1277,6 +1330,8 @@ def MenuAdd():
                 msg = "fail"
         return render_template('MenuAdd.html', messages=msg, username=username)
 
+
+# 外卖员订单页面
 @app.route('/DPIndex',methods=['GET','POST'])
 def DPIndexPage():
     msg = ""
@@ -1284,7 +1339,7 @@ def DPIndexPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", db="test", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -1306,7 +1361,7 @@ def DPIndexPage():
             return render_template('DPIndex.html', username=username, messages=msg)
 
     elif request.method == 'POST' and request.form.get("action") == "订单送达":
-        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", db=db_name, charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -1330,12 +1385,13 @@ def DPIndexPage():
     else:
         return render_template('DPIndex.html', username=username, messages=msg)
 
+
 @app.route('/DPpersonal')
 def DPpersonalPage():
     return render_template('DPpersonal.html')
 
-@app.route('/MerchantIndex')
 
+@app.route('/MerchantIndex')
 def Merchantindexpage():
     return render_template('MerchantIndex.html')
 
@@ -1346,6 +1402,38 @@ def MpersonalPage():
     return render_template('MerchantPersonal.html')
 
 #展示商家个人信息页面
+@app.route('/MerchantViewPerInfo',methods=['GET', 'POST'])
+def MerchantViewPerInfo():
+    msg = ""
+    if request.method == 'GET':
+        msg = ""
+        # 连接数据库，默认数据库用户名root，密码空
+        db = pymysql.connect(host="localhost", user="root", password="123456", database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+        # 查询
+        sql = "SELECT ShopID,ShopPassword,ShopAddress,ShopPhone,Shop.img_res from Shop where ShopID = '{}'" .format(username)
+
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        # print(res)
+        # print(len(res))
+        if len(res) != 0:
+            msg = "done"
+            print(msg)
+            print(len(res))
+            return render_template('MerchantViewPerInfo.html', username=username, result=res, messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('MerchantViewPerInfo.html', username=username, messages=msg)
+
+
+
+# 展示商家个人信息页面
 @app.route('/MerchantViewPerInfo',methods=['GET', 'POST'])
 def MerchantViewPerInfo():
     msg = ""
@@ -1397,9 +1485,7 @@ def MerchantModifyPerInfo():
         if filename != '':
             f.save('static/images/' + filename)
         imgsrc = 'static/images/' + filename
-		
-		
-		
+
         # 连接数据库，默认数据库用户名root，密码空
         db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
         cursor = db.cursor()
@@ -1460,7 +1546,7 @@ def MerModifyPassword():
             msg = "not equal"
             return render_template('MerchantModifyPwd.html', messages=msg, username=username)
 
-#商家查看订单
+# 商家查看订单
 @app.route('/MerchantOrderPage', methods=['GET', 'POST'])
 def MerchantOrderPage():
     msg = ""
