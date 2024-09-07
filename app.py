@@ -205,6 +205,28 @@ def logInPage():
                 msg = "fail3"
             return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
 
+        elif userRole == 'DeliveryPerson':
+            cursor = db.cursor()
+            try:
+                cursor.execute("use appDB")
+            except:
+                print("Error: unable to use database!")
+            sql = "SELECT * from DeliveryPersons where DeliveryPersonID = '{}' and DeliveryPersonPassword='{}'".format(username, password)
+            cursor.execute(sql)
+            db.commit()
+            res = cursor.fetchall()
+            num = 0
+            for row in res:
+                num = num + 1
+            # 如果存在该外卖员且密码正确
+            if num == 1:
+                print("登录成功！欢迎外卖员用户！")
+                msg = "done4"
+            else:
+                print("您没有用户权限，未注册或登录信息出错。。")
+                msg = "fail4"
+            return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
+
 # 管理员的店铺列表页面
 @app.route('/adminRestList', methods=['GET', 'POST'])
 def adminRestListPage():
@@ -1255,7 +1277,62 @@ def MenuAdd():
                 msg = "fail"
         return render_template('MenuAdd.html', messages=msg, username=username)
 
+@app.route('/DPIndex',methods=['GET','POST'])
+def DPIndexPage():
+    msg = ""
+    global notFinishedNum
+    if request.method == 'GET':
+        msg = ""
+        # 连接数据库，默认数据库用户名root，密码空
+        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", db="test", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+        # 查询未完成订单数量
+        presql = "SELECT * FROM Orders WHERE DeliveryPersonID = '%s' AND Status = 3 order by PickupTime" % username
+        cursor.execute(presql)
+        res = cursor.fetchall()
+        notFinishedNum = len(res)
+        if len(res):
+            msg = "done"
+            print(msg)
+            return render_template('DPIndex.html', username=username, result=res, messages=msg,
+                                   notFinishedNum=notFinishedNum)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('DPIndex.html', username=username, messages=msg)
 
+    elif request.method == 'POST' and request.form.get("action") == "订单送达":
+        db = pymysql.connect(host="localhost", user="sovendea", password="sovendea", db=db_name, charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        print("外卖员订单确认送达啦")
+        orderID = request.form['orderID']
+        print(orderID)
+
+        try:
+            cursor.callproc('dpConfirm', (orderID,))
+            db.commit()
+        except Exception as e:
+            print(f"Error: {e}")
+            db.rollback()
+
+        msg = "UpdateSucceed"
+        return render_template('DPIndex.html', username=username, messages=msg)
+
+    else:
+        return render_template('DPIndex.html', username=username, messages=msg)
+
+@app.route('/DPpersonal')
+def DPpersonalPage():
+    return render_template('DPpersonal.html')
 
 @app.route('/MerchantIndex')
 
