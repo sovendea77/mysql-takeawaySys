@@ -1699,12 +1699,12 @@ def MerchantOrderPage():
         except:
             print("Error: unable to use database!")
         # 查询未完成订单数量
-        presql = "SELECT Orders.OrderID,Orders.UserID,Orders.ShopID,Orders.Status,OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,7,8) AND Comments.Description <> '' " % restaurant
+        presql = "SELECT Orders.OrderID,Orders.UserID,Orders.ShopID,Orders.Status,OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(1) AND Comments.Description <> '' " % username
         cursor.execute(presql)
         res1 = cursor.fetchall()
         notFinishedNum = len(res1)
         # 查询其他信息
-        sql = "SELECT Orders.OrderID,Orders.UserID,Orders.ShopID,Orders.Status,OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s'" % username
+        sql = "SELECT Orders.OrderID,Orders.UserID,Orders.ShopID,Orders.Status,OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,6,7,8)" % username
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
@@ -1712,7 +1712,7 @@ def MerchantOrderPage():
         if len(res):
             msg = "done"
             print(msg)
-            return render_template('MerchantOrderPage.html', username=username, result=res, messages=msg,
+            return render_template('MerchantOrderPage.html', username=username, result=res1, finish=res, messages=msg,
                                    notFinishedNum=notFinishedNum)
         else:
             print("NULL")
@@ -1784,6 +1784,48 @@ def MerchantOrderPage():
             print("NULL")
             msg = "none"
         return render_template('MerchantOrderPage.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
+
+    elif request.method == 'POST' and request.form["action"] == "确认接单":
+
+        oid = request.form.get("orderID")
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        sql = "update Orders set Status = 2  where orderID = %s" % oid
+        cursor.execute(sql)
+        db.commit()
+
+        try:
+            cursor.callproc('deliveryAssignment', (oid,))
+            db.commit()
+        except Exception as e:
+            print(f"Error: {e}")
+            db.rollback()
+
+        presql = "SELECT Orders.OrderID,Orders.UserID,Orders.ShopID,Orders.Status,OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(1) AND Comments.Description <> '' " % username
+        cursor.execute(presql)
+        res1 = cursor.fetchall()
+        notFinishedNum = len(res1)
+        # 查询其他信息
+        sql = "SELECT Orders.OrderID,Orders.UserID,Orders.ShopID,Orders.Status,OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,6,7,8)" % username
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        # print(res)
+        # print(len(res))
+        if len(res):
+            msg = "done"
+            print(msg)
+            return render_template('MerchantOrderPage.html', username=username, result=res1, finish=res, messages=msg,
+                                   notFinishedNum=notFinishedNum)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('MerchantOrderPage.html', username=username, messages=msg)
+
     else:
         return render_template('MerchantOrderPage.html', username=username, messages=msg)
 
