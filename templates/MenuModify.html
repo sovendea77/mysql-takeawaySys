@@ -88,25 +88,12 @@
 														<label for="activities">菜品名</label>
 														<input type="text" name="dishname" class="form-control" value="{{ dishname }}" placeholder="{{dishname}} " readonly="readonly" style="background:transparent;"/>
 													</div>
-												</div>
-												     <div class="col-md-12">
-														<label for="activities">商家名</label>
-														<input type="text" name="rest" class="form-control" value="{{ rest }}" placeholder="{{rest}} " readonly="readonly" style="background:transparent;"/>
-													</div>
 												<div class="row form-group">
 													<div class="col-md-12">
 														<label for="date-start">菜品描述</label>
 														<input type="text" name="dishinfo"  value="{{ dishinfo }}" placeholder="{{dishinfo}} " class="form-control" style="background:transparent; height: 80px;">
 													</div>
 												</div>
-
-                                                <div class="row form-group">
-													<div class="col-md-12">
-														<label for="date-start">营养成分</label>
-														<input type="text" name="nutriention"  value="{{ nutriention }}" placeholder="{{ nutriention }} " class="form-control" style="background:transparent; height: 80px;">
-													</div>
-												</div>
-
                                                 <div class="row form-group">
 													<div class="col-md-12">
 														<label for="activities">价格</label>
@@ -115,17 +102,8 @@
 												</div>
                                                 <div class="row form-group">
 													<div class="col-md-12">
-														<label for="activities">菜品图片</label>
-                                                        <input type="file" name="imagesrc"  style="background:transparent; height: 80px;">
-													</div>
-												</div
-                                                <div class="row form-group">
-													<div class="col-md-12">
-														<label for="activities">是否为招牌菜</label><br>
-														<input type="radio" name="isSpecialty" value="1" id="true" />
-                                                        <label for="true">是</label>
-    													<input type="radio" name="isSpecialty" value="0" id="false"/>
-                                                        <label for="false">否</label>
+														<label for="activities">数量</label>
+														<input type="text" name="num"  value="{{ num }}" placeholder="{{ num }} " class="form-control" style="background:transparent; height: 80px;">
 													</div>
 												</div>
 
@@ -135,10 +113,6 @@
 													</div>
 												</div>
 											</form>
-                                            {% if isSpecialty =="1"%}
-                                                <script>alert("是招牌菜")</script>
-                                                <script>$("input[type=radio][name='isSpecialty'][value='1']").prop("checked", "checked");</script>
-                                            {% endif %}
 
                                             {% if messages == "done" %}
 												<script>alert("修改成功！")</script>

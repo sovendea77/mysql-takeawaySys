@@ -65,61 +65,49 @@
 					<!-- <p>Dignissimos asperiores vitae velit veniam totam fuga molestias accusamus alias autem provident. Odit ab aliquam dolor eius.</p> -->
 				</div>
 			</div>
-			<!-- TODO: 此处还想加一个按照时间顺序或价格排列 -->
-			<div class="selectcondition">
-				<form action="{{ url_for('MerchantOrderPage') }}" method="post">
-					<input type="submit" name="action" value="按时间排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<span class="badge" style="float: right;">{{ notFinishedNum }}</span><input type="submit" name="action" value="未完成订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
-				</form>
-			</div>
+
 			<br/><br/>
-			<!-- 展示我的全部订单 -->
-			<div class="row">
-				<div class="col-lg-12 col-md-4 col-sm-6">
-					{% if messages == "done" %}
-						{% for item in result %}
-							<a href={{item[8]}} class="fh5co-card-item image-popup">
-								<figure class="col-lg-4" style="float: left;">
-									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src={{item[8]}} alt="Image" class="img-responsive">
-								</figure>
-								<div class="fh5co-text">
-									<h2 style="margin-top: 40px;"> 菜品：{{ item[2] }} </h2>
-									<p>订单号：{{ item[0] }}</p>
-									<p>交易时间：{{ item[9] }}</p>
-									<!-- mode=0：外卖，mode=1：堂食 -->
-									{% if item[4] == 1 %}
-										<p>就餐方式：堂食</p>
-										<p>餐厅地址：{{ item[6] }}</p>
-										<p>取餐时间：{{ item[5] }}</p>
-									{% elif item[4] == 0 %}
-										<p>就餐方式：外卖</p>
-										<p>配送地址：{{ item[6] }}</p>
-										<p>送达时间：{{ item[5] }}</p>
-									{% endif %}
-									{% if item[7] == 1 %}
-										<p>订单状态：已完成</p>
-									{% elif item[7] == 0 %}
-										<p>订单状态：<span style="color: red;">未完成</span></p>
-									{% endif %}
-									<p>订单总价格：<span class="price cursive-font">￥{{ item[13]}}</span></p>
-								</div>
-							</a>
-						{% endfor %}
+					<!-- 展示我的全部订单 -->
 
-					{% elif messages == "none" %}
-						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
-						<div class="alert alert-danger" role="alert">您还没有订单哦！</div>
-					{% endif %}
+			<div class="orders-list">
+	        	<h2>未完成订单</h2>
+	        	<ul>
+	        	    {% for item in result %}
+	        	    <li>
+	        	        <div class="order-details">
+	        	        	<p>订单号：{{ item[0] }}</p>
+	        	        	<p>总价：{{ item[4] }} 元</p>
+	        	    	</div>
+						<div class="action-buttons">
+							<form action="{{ url_for('MerchantOrderPage') }}" method="post">
+								<input type = "hidden" name = "orderID" value = "{{ item[0] }}">
+								<input type="submit" name="action" value="确认接单" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
+							</form>
+	    		        </div>
+	        	    </li>
+	        	    {% endfor %}
+	        	</ul>
+	    	</div>
 
-				</div>
 
-			</div>
+			<div class="orders-list">
+	    		<h2>已完成订单</h2>
+	    		<ul>
+	    		    {% for item in finish %}
+	    		    <li>
+	    		        <div class="order-details">
+	    		            <p>订单号：{{ item[0] }}</p>
+	        	        	<p>总价：{{ item[4] }} 元</p>
+	        	        	<p>用户评价：{{ item[5] }}</p>
+	    		        </div>
+	    		    </li>
+	    		    {% endfor %}
+	    		</ul>
+	    	</div>
 		</div>
+
 	</div>
-	<div>
-	</div>
+
 
 
     	<!-- jQuery -->
