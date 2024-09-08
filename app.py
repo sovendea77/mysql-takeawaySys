@@ -192,7 +192,7 @@ def logInPage():
                 msg = "fail1"
             return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
 
-        elif userRole == 'RESTAURANT':
+        elif userRole == 'shop':
             cursor = db.cursor()
             try:
                 cursor.execute("use test2")
@@ -386,7 +386,7 @@ def adminOrder():
             print("Error: unable to use database!")
 
         # 查询
-        sql = "SELECT * FROM RESTAURANT"
+        sql = "SELECT * FROM Orders where Status=6"
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
@@ -399,6 +399,54 @@ def adminOrder():
             print("NULL")
             msg = "none"
             return render_template('adminOrderList.html', username=username, messages=msg)
+
+    elif request.form["action"]=="退款成功":
+        order_id1 = request.form['order_id1']
+
+        # 连接数据库
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        try:
+            with db.cursor() as cursor:
+                # 更新数据库
+                sql = "UPDATE Orders SET Status=7 WHERE OrderID = %s"  # 假设你的表名是ORDERS，字段是status和id
+                cursor.execute(sql, (order_id1))
+
+            db.commit()
+            msg = "Order status updated successfully!"
+
+        except pymysql.MySQLError as e:
+            print(f"Error: {e}")
+            msg = "Error updating order status!"
+
+        finally:
+            db.close()
+
+        return redirect(url_for('adminOrder'))
+
+    elif request.form["action"]=="退款失败":
+        order_id2 = request.form['order_id2']
+
+        # 连接数据库
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        try:
+            with db.cursor() as cursor:
+                # 更新数据库
+                sql = "UPDATE Orders SET Status=8 WHERE OrderID = %s"
+                cursor.execute(sql, (order_id2))
+
+            db.commit()
+            msg = "Order status updated successfully!"
+
+        except pymysql.MySQLError as e:
+            print(f"Error: {e}")
+            msg = "Error updating order status!"
+
+        finally:
+            db.close()
+
+        return redirect(url_for('adminOrder'))
+
+
 
 
 
@@ -625,12 +673,16 @@ def page_not_found(error):
 
 order_id=None
 yhq=None
+new_status=None
+price=None
 # 购物车
 @app.route('/settlement',methods=['GET', 'POST'])
 def shopping():
     msg = ""
     global order_id
     global yhq
+    global new_status
+    global price
     if request.method == 'GET':
         #print("myOrder-->GET")
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
@@ -649,15 +701,16 @@ def shopping():
         sql = "SELECT * from Orders where OrderID=LAST_INSERT_ID()"
         cursor.execute(sql)
         res2 = cursor.fetchall()
-        print(res1)
-        print(res2)
         order_id = res2[0][0]
+
+        # 目前的价钱
+        price = 0.0
         # print(len(res))
         if len(res1) != 0 and len(res2) != 0:
             msg = "done"
             print(msg)
-            print(len(res1))
-            return render_template('settlement.html', username=username, result1=res1, messages=msg)
+            #print(len(res1))
+            return render_template('settlement.html', username=username, result1=res1,pr=price,oid=order_id, messages=msg)
         else:
             print("NULL")
             msg = "none"
@@ -676,21 +729,26 @@ def shopping():
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
-
-        sql = "insert into OrdersDishes(OrderNumber, DishID) values({},{})".format(int(order_id),int(new_status))
+        sql = "call  Sel_dish({},{})".format(int(order_id),int(new_status))
         cursor.execute(sql)
         db.commit()
-        msg = "Order status updated successfully!"
+
+        sql = "select OrderTotalPrice from Orders where OrderID ={}".format(int(order_id))
+        cursor.execute(sql)
+        res2 = cursor.fetchall()
+        #目前的价钱
+        price=float(res2[0][0])
+
+        #菜品信息
         sql = "SELECT * FROM Dishes WHERE ShopID = '%s'" % restaurant
         cursor.execute(sql)
         res1 = cursor.fetchall()
-
         # print(len(res))
         if len(res1) != 0 :
             msg = "done"
             print(msg)
-            print(len(res1))
-            return render_template('settlement.html', username=username, result1=res1,
+            #print(len(res1))
+            return render_template('settlement.html', username=username, result1=res1,pr=price,oid=order_id,
                                            messages=msg)
         else:
             print("NULL")
@@ -709,20 +767,26 @@ def shopping():
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
-        sql = "update Orders set CouponID={} where OrderID={}".format(int(yhq), int(order_id))
-        cursor.execute(sql)
-        db.commit()
+        if len(yhq)!=0:
+            # 更新订单表
+            sql = "update Orders set CouponID={} where OrderID={}".format(int(yhq), int(order_id))
+            cursor.execute(sql)
+            db.commit()
+            # 更新用户拥有表
+            sql = "update UsersCoupons set Quantity=Quantity-1 where UserID='{}' and CouponID={}".format(username,
+                                                                                                         int(yhq))
+            cursor.execute(sql)
+            db.commit()
         msg = "Order status updated successfully!"
         sql = "SELECT * FROM Dishes WHERE ShopID = '%s'" % restaurant
         cursor.execute(sql)
         res1 = cursor.fetchall()
-
         # print(len(res))
         if len(res1) != 0 :
             msg = "done"
             print(msg)
             print(len(res1))
-            return render_template('settlement.html', username=username, result1=res1,
+            return render_template('settlement.html', username=username, result1=res1,pr=price,oid=order_id,
                                    messages=msg)
         else:
             print("NULL")
@@ -874,6 +938,31 @@ def OrderPage():
         print(f"已完成订单数量{finished_num}")
 
         # 查询待退款订单数量 status = 6
+        pending_refund_sql = "SELECT * FROM orders WHERE userID = '%s' AND status = 6" % username
+        cursor.execute(pending_refund_sql)
+        pending_refund_res = cursor.fetchall()
+        print(pending_refund_res)
+        pending_refund_num = len(pending_refund_res)
+        print(f"已完成订单数量{pending_refund_num}")
+
+        if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
+            msg = "done"
+            print(msg)
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
+
+        # 查询待退款订单数量 status = 6
         pending_refund_sql = "SELECT * FROM orders WHERE userID = %s AND status = 6" % username
         cursor.execute(pending_refund_sql)
         pending_refund_res = cursor.fetchall()
@@ -914,10 +1003,10 @@ def OrderPage():
 
     # 确认收货
     elif request.form["action"] == "确认收货":
-        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appdb")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
         print("用户要确认收货啦")
@@ -951,18 +1040,6 @@ def OrderPage():
         pending_refund_num = len(pending_refund_res)
         print(f"已完成订单数量{pending_refund_num}")
 
-        # 展示订单的菜品图片
-        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
-        cursor.execute(orderdishes_sql)
-        orderdishes_median = cursor.fetchall()
-        print(orderdishes_median)
-        orderdishes_res = []
-        for od in orderdishes_median:
-            od_list = list(od)
-            od_list[2] = "static/images/" + od_list[2]
-            orderdishes_res.append(od_list)
-        print(f"订单菜品新列表：{orderdishes_res}")
-
         if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
             msg = "done"
             print(msg)
@@ -970,7 +1047,6 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
-                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
         else:
             print("NULL")
@@ -979,7 +1055,6 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
-                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
     # 跳转到写评价页面
     elif request.form["action"] == '去评价':
@@ -1029,18 +1104,6 @@ def OrderPage():
         pending_refund_num = len(pending_refund_res)
         print(f"已完成订单数量{pending_refund_num}")
 
-        # 展示订单的菜品图片
-        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
-        cursor.execute(orderdishes_sql)
-        orderdishes_median = cursor.fetchall()
-        print(orderdishes_median)
-        orderdishes_res = []
-        for od in orderdishes_median:
-            od_list = list(od)
-            od_list[2] = "static/images/" + od_list[2]
-            orderdishes_res.append(od_list)
-        print(f"订单菜品新列表：{orderdishes_res}")
-
         if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
             msg = "done"
             print(msg)
@@ -1048,7 +1111,6 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
-                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
         else:
             print("NULL")
@@ -1057,7 +1119,6 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
-                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
 
 
@@ -1226,7 +1287,7 @@ def WriteCommentsPage():
         db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appDB")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
         # 获取当前orderID
