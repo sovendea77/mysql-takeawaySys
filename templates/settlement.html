@@ -30,6 +30,13 @@
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	<script src="static/js/modernizr-2.6.2.min.js"></script>
+    <script>
+
+        function showPaymentSuccess() {
+
+            alert("付款成功！");
+        }
+    </script>
 </head>
 <body>
     <div class="gtco-loader"></div>
@@ -39,7 +46,7 @@
 				<div class="gtco-container">
 					<div class="row">
 						<div class="col-sm-4 col-xs-12">
-							<div id="gtco-logo"><a href="adminUserList">用户信息<em></em></a></div>
+							<div id="gtco-logo"><a href="settlement">选择菜品<em></em></a></div>
                 		</div>
 
             		</div>
@@ -51,6 +58,7 @@
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
 					<h2 class="cursive-font primary-color">选择商品</h2>
+
 				</div>
 			</div>
 			<div >
@@ -82,10 +90,10 @@
             </td>
             <td style="width:400px;">
                 <form action="{{ url_for('shopping') }}" method="post">
-        <input type="hidden" name="order_id" value="{{result2[0][0]}}"> <!-- 假设我们要更新的订单ID是1 -->
+
         <input type="hidden" name="new_status" value="{{item[0]}}"> <!-- 假设我们要将状态更新为completed -->
 
-        <button type="submit" >选择</button>
+        <button type="submit" name="action" value="选择">选择</button>
     </form>
             </td>
         </tr>
@@ -93,21 +101,23 @@
     </tbody>
 </table>
                 <form action="{{ url_for('shopping') }}" method="post">
-  <label for="cars">选择优惠券</label>
-  <select name="cars" id="cars">
-    <option value="1">满300减30</option>
-    <option value="2">满200减20</option>
-    <option value="3">满100减10</option>
+  <label for="mySelect">选择优惠券</label>
+  <select  id="mySelect">
+    <option  value="1">满300减30</option>
+    <option  value="2">满200减20</option>
+    <option  value="3">满100减10</option>
   </select>
   <br><br>
-  <input type="submit" value="提交">
+
+                    <input type="text" id="myInput" name="yhq">
+  <input type="submit"  name="action" value="提交">
 </form>
 
 		<!-- 在</tbody>下面添加的模块 -->
 <!-- 在</tbody>下面添加的模块 -->
 <div class="checkout-module">
      <span class="current-amount">当前金额: $0.00</span>
-    <button class="checkout-button" ><a href="jiesuan" >结算</a></button>
+    <button class="checkout-button" onclick="showPaymentSuccess()"><a href="jiesuan" >结算</a></button>
 </div>
 
 <!-- 可选的CSS样式来美化按钮 -->
@@ -145,6 +155,14 @@
 		</div>
 	</div>
     </div>
+    <script>
+    const selectElement = document.getElementById('mySelect');
+    const inputElement = document.getElementById('myInput');
+     selectElement.addEventListener('change', function() {
+     const selectedValue = this.value;
+    inputElement.value = selectedValue;
+});
+    </script>
     <!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
 	<!-- jQuery Easing -->
