@@ -793,19 +793,22 @@ def ModifyPassword():
 
 
 # 用户订单页面
+# 用户订单页面
 @app.route('/OrderPage', methods=['GET', 'POST'])
 def OrderPage():
     msg = ""
-    global notFinishedNum
+    global notFinished_num
+    # 显示订单
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appDB")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
+
         # 查询未完成订单数量
         presql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 0" % username
         cursor.execute(presql)
@@ -856,16 +859,12 @@ def OrderPage():
         except:
             print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' Order BY cost ASC" % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
+        if len(unfinished_res) and len(finished_res):
             msg = "done"
             print(msg)
-            return render_template('OrderPage.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
         else:
             print("NULL")
             msg = "none"
@@ -896,34 +895,47 @@ def OrderPage():
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appDB")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
         print("用户要确认收货啦")
-        orderID = request.form['orderID']
-        print(orderID)
-        sql1 = "Update ORDER_COMMENT SET isFinished = 1, text = '' WHERE orderID = '%s' " % orderID
-        print(sql1)
-        cursor.execute(sql1)
+        orderID = request.form.get('orderID')
+        print(f"orderID为{orderID}")
+        # 更新订单状态，使其进入已完成序列
+        sql1 = "UPDATE orders SET status = 5 where orderID = %s"
+        cursor.execute(sql1, (orderID,))
         db.commit()
 
-        sql2 = "select * from ORDER_COMMENT WHERE orderID = '%s' " % orderID
-        cursor.execute(sql2)
-        res1 = cursor.fetchone()
-        restaurant = res1[1]
-        dishname = res1[2]
-        print("{} {} 销量+1".format(dishname, restaurant))
+        # 查询未完成订单数量
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status != 5 and status != 7 and status != 8" % username
+        cursor.execute(unfinished_sql)
+        unfinished_res = cursor.fetchall()
+        print(unfinished_res)
+        notFinished_num = len(unfinished_res)
+        print(f"未完成订单数量{notFinished_num}")
+        # 查询已完成订单数量
+        finished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 5 or status = 7 or status = 8)" % username
+        cursor.execute(finished_sql)
+        finished_res = cursor.fetchall()
+        print(finished_res)
+        finished_num = len(finished_res)
+        print(f"已完成订单数量{finished_num}")
 
-        sql = "Update DISHES SET sales = sales+1 WHERE dishname = '{}' AND restaurant = '{}'" .format(dishname, restaurant)
-        print(sql)
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        msg = "UpdateSucceed"
-        return render_template('OrderPage.html', username=username, messages=msg)
-
-    else:
-        return render_template('OrderPage.html', username=username, messages=msg)
+        if len(unfinished_res) and len(finished_res):
+            msg = "done"
+            print(msg)
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
+    elif request.form["action"] == '去评价':
+        print("跳转到评价页面")
+        return render_template('WriteComments.html', username=username, messages=msg)
 
 
 # 我的评论页面
@@ -931,32 +943,28 @@ def OrderPage():
 def MyCommentsPage():
     msg = ""
     global notFinishedNum
-
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appDB")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
-        # 查询未完成及未评论订单数量
-        presql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text = '' " % username
-        cursor.execute(presql)
-        res1 = cursor.fetchall()
-        notFinishedNum = len(res1)
-        # 查询其他信息
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' and isFinished = 1 and text <> '' " % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        # print(res)
-        # print(len(res))
-        if len(res):
+        # 查询未完成订单
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status != 5 and status != 7 and status != 8" % username
+        cursor.execute(unfinished_sql)
+        unfinished_res = cursor.fetchall()
+        print(unfinished_res)
+        notFinished_num = len(unfinished_res)
+        print(f"未完成订单数量{notFinished_num}")
+        if len(unfinished_res) :
             msg = "done"
             print(msg)
-            return render_template('MyComments.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
+            return render_template('MyComments.html', username=username,
+                                   unfinished_result=unfinished_res, messages=msg,
+                                   notFinishedNum=notFinished_num)
         else:
             print("NULL")
             msg = "none"

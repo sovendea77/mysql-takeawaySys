@@ -68,44 +68,59 @@
 			</div>
 
 			<br/><br/>
+
 			<!-- 展示我的全部订单 -->
 			<div class="row">
 				<div class="orders-list">
-			        <h2>已完成订单</h2>
+			        <h2>已完成订单：{{ finishedNum }}</h2>
 			        <ul>
-			            {% for order in orders %}
-			            <li>
-			                <div class="order-details">
-			            	    <p>订单号：{{ order.order_number }}</p>
-			            	    <p>商品：{{ ','.join(order.items) }}</p>
-			            	    <p>总价：{{ order.total }} 元</p>
-			            	</div>
+					    {% if finished_result %}
+					    {% for order in finished_result %}
+					    <li>
+					        <div class="order-details">
+					            <p>订单号：{{ order[0] }}</p>
+					            <p>总价：{{ order[2] }} 元</p>
+					        </div>
+					        <form action="" method="POST" enctype="multipart/form-data">
 							<div class="action-buttons">
-								<button type="button" class="confirm-button">申请退款</button>
-			                	<button type="button" class="confirm-button">去评价</button>
+								<input type="hidden" name="orderID" value="{{order[0]}}">
+			                	<button type="submit" name="action" value="申请退款" class="confirm-button">申请退款</button>
+								<button type="submit" name="action" value="去评价" class="confirm-button">去评价</button>
 			            	</div>
-			            </li>
-			            {% endfor %}
-			        </ul>
+						</form>
+					    </li>
+					    {% endfor %}
+					    {% else %}
+					    <li>没有未完成的订单。</li>
+					    {% endif %}
+					</ul>
 			    </div>
 
 				<div class="orders-list">
-			    <h2>未完成订单</h2>
+			    <h2>未完成订单：{{ notFinishedNum }}</h2>
 			    <ul>
-			        {% for order in orders %}
+					{% if unfinished_result %}
+			        {% for order in unfinished_result %}
 			        <li>
 			            <div class="order-details">
-			                <p>订单号：{{ order.order_number }}</p>
-			                <p>商品：{{ ','.join(order.items) }}</p>
-			                <p>总价：{{ order.total }} 元</p>
-			                <p>评价：{{ order.comments }}</p>
+			                <p>订单号：{{ order[0] }}</p>
+<!--			                <p>商品：{{ ','.join(order.items) }}</p>-->
+			                <p>总价：{{ order[2] }} 元</p>
+<!--			                <p>评价：{{ order.comments }}</p>-->
 			            </div>
-			            <div class="action-buttons">
-			                <button type="button" class="confirm-button">申请退款</button>
-							<button type="button" class="confirm-button">确认收获</button>
-			            </div>
+						<form action="" method="POST" enctype="multipart/form-data">
+							<div class="action-buttons">
+								<input type="hidden" name="orderID" value="{{order[0]}}">
+			                	<button type="submit" name="action" value="申请退款" class="confirm-button">申请退款</button>
+								<button type="submit" name="action" value="确认收货" class="confirm-button">确认收货</button>
+			            	</div>
+						</form>
+
 			        </li>
 			        {% endfor %}
+					{% else %}
+					    <li>没有已完成的订单。</li>
+					{% endif %}
 			    </ul>
 			    </div>
 
