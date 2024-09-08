@@ -1524,10 +1524,41 @@ def DPIndexPage():
         return render_template('DPIndex.html', username=username, messages=msg)
 
 
-@app.route('/DPpersonal')
+@app.route('/DPpersonal',methods=['GET','POST'])
 def DPpersonalPage():
-    return render_template('DPpersonal.html')
+    if request.method == 'GET':
+        # 连接数据库，默认数据库用户名root，密码空
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
 
+        presql = "SELECT * FROM DeliveryPersons WHERE DeliveryPersonID = '%s'" % username
+        cursor.execute(presql)
+        res = cursor.fetchall()
+        res = res[0][4]
+        return render_template('DPpersonal.html', username=username, type=res)
+
+    elif request.method == 'POST' and request.form.get("action") == "确定":
+        if request.form.get("order") == "1":
+            status = 1
+        else:
+            status = 0
+
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        presql = "update DeliveryPersons set IsDeliveried = %d WHERE DeliveryPersonID = '%s'" %(status, username)
+        cursor.execute(presql)
+        db.commit()
+        print(presql)
+        return render_template('DPpersonal.html', username=username, type=status)
 
 @app.route('/MerchantIndex')
 def Merchantindexpage():
