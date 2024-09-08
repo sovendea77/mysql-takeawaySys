@@ -30,6 +30,13 @@
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	<script src="static/js/modernizr-2.6.2.min.js"></script>
+    <script>
+
+        function showPaymentSuccess() {
+
+            alert("付款成功！");
+        }
+    </script>
 </head>
 <body>
     <div class="gtco-loader"></div>
@@ -39,22 +46,8 @@
 				<div class="gtco-container">
 					<div class="row">
 						<div class="col-sm-4 col-xs-12">
-							<div id="gtco-logo"><a href="adminUserList">用户信息<em></em></a></div>
+							<div id="gtco-logo"><a href="settlement">选择菜品<em></em></a></div>
                 		</div>
-						<div class="col-xs-8 text-right menu-1">
-                    <ul>
-						<li class="has-dropdown">
-                            <a href="personal">个人中心</a>
-                            <ul class="dropdown">
-								<li><a href="ModifyPersonalInfo">修改个人信息</a></li>
-								<li><a href="ModifyPassword">修改密码</a></li>
-                                <li><a href="OrderPage">我的订单</a></li>
-                                <li><a href="MyComments">我的评价</a></li>
-                                <li><a href="WriteComments">发表评价</a></li>
-                            </ul>
-						</li>
-                    </ul>
-                	</div>
             		</div>
         		</div>
 			</nav>
@@ -64,6 +57,7 @@
 			<div class="row">
 				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
 					<h2 class="cursive-font primary-color">选择商品</h2>
+
 				</div>
 			</div>
 			<div >
@@ -71,43 +65,58 @@
 				<table>
     <thead>
         <tr>
-            <th style="width:200px;">商店名</th>
-            <th style="width:200px;">密码</th>
-            <th style="width:200px;">地址</th>
-            <th style="width:200px;">联系电话</th>
+            <th style="width:200px;">菜品名</th>
+            <th style="width:200px;">菜品描述</th>
+            <th style="width:200px;">剩余数量</th>
+            <th style="width:200px;">价格</th>
             <th style="width:400px;">选择</th>
         </tr>
     </thead>
     <tbody>
-        {% for item in result %}
+        {% for item in result1 %}
         <tr>
-            <td style="width:200px;">
-                {{ item[0] }}
-            </td>
-            <td style="width:200px;">
-                {{ item[1] }}
-            </td>
             <td style="width:200px;">
                 {{ item[2] }}
             </td>
             <td style="width:200px;">
                 {{ item[3] }}
             </td>
+            <td style="width:200px;">
+                {{ item[5] }}
+            </td>
+            <td style="width:200px;">
+                {{ item[2] }}
+            </td>
             <td style="width:400px;">
                 <form action="{{ url_for('shopping') }}" method="post">
-        <input type="hidden" name="order_id" value="{{item[0]}}"> <!-- 假设我们要更新的订单ID是1 -->
-        <input type="hidden" name="new_status" value="completed"> <!-- 假设我们要将状态更新为completed -->
-        <button type="submit" >选择</button>
+
+        <input type="hidden" name="new_status" value="{{item[0]}}"> <!-- 假设我们要将状态更新为completed -->
+
+        <button type="submit" name="action" value="选择">选择</button>
     </form>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+                <form action="{{ url_for('shopping') }}" method="post">
+  <label for="mySelect">选择优惠券</label>
+  <select  id="mySelect">
+    <option  value="1">满300减30</option>
+    <option  value="2">满200减20</option>
+    <option  value="3">满100减10</option>
+  </select>
+  <br><br>
+
+                    <input type="text" id="myInput" name="yhq">
+  <input type="submit"  name="action" value="提交">
+</form>
+
+		<!-- 在</tbody>下面添加的模块 -->
 <!-- 在</tbody>下面添加的模块 -->
 <div class="checkout-module">
-	 <span class="current-amount">当前金额: $0.00</span>
-    <button type="button" class="checkout-button" onclick="handleCheckout()">结算</button>
+     <span class="current-amount">当前金额: $0.00</span>
+    <button class="checkout-button" onclick="showPaymentSuccess()"><a href="jiesuan" >结算</a></button>
 </div>
 
 <!-- 可选的CSS样式来美化按钮 -->
@@ -129,6 +138,8 @@
     }
 </style>
 
+
+
 				{% elif messages == "none" %}
 					<div class="alert alert-danger" role="alert">暂无商家</div>
 				{% elif messages == "delete" %}
@@ -142,6 +153,14 @@
 		</div>
 	</div>
     </div>
+    <script>
+    const selectElement = document.getElementById('mySelect');
+    const inputElement = document.getElementById('myInput');
+     selectElement.addEventListener('change', function() {
+     const selectedValue = this.value;
+    inputElement.value = selectedValue;
+});
+    </script>
     <!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
 	<!-- jQuery Easing -->

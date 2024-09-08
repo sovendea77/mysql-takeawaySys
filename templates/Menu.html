@@ -39,8 +39,7 @@
                 <div class="col-xs-8 text-right menu-1">
                     <ul>
                         <li><a href="UserRestList">商家列表</a></li>
-						<li><a href="ResComment">商家评价</a></li>
-						<li><a href="myOrder">购物车</a></li>
+						<li><a href="settlement">购物车</a></li>
 						<li class="has-dropdown">
                             <a href="personal">个人中心</a>
                             <ul class="dropdown">
@@ -70,8 +69,7 @@
 			<!-- TODO: 此处还想加一个按照时间顺序或价格排列 -->
 			<div class="selectcondition">
 				<form action="{{ url_for('menu') }}" method="post">
-					<input type="submit" name="action" value="特色菜" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<input type="submit" name="action" value="按销量排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
+					<input type="submit" name="action" value="按数量排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
 					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
 				</form>
 			</div>
@@ -84,25 +82,16 @@
 							<div class="fh5co-card-item">
 								<figure class="col-lg-4" style="float: left;">
 									<div class="overlay"><i class="ti-plus"></i></div>
-									<img src={{item[6]}} alt="Image" class="img-responsive">
+									<img src={{item[5]}} alt="Image" class="img-responsive">
 								</figure>
 								<div class="fh5co-text">
-                                    {% if item[7] == 1 %}
-                                    <h1 style="margin-top: 0px;">特色菜</h1>
-                                    {% endif %}
 									<h2 style="margin-top: 40px; font-weight: bold;"> 菜品：{{ item[0] }} </h2>
 									<p>菜品描述：{{ item[2] }}</p>
-									<p>营养成分：{{ item[3] }}</p>
-                                    <p>销量：{{item[5] }}</p>
-									<p style="margin-left: 322px;">价格：<span class="price cursive-font">￥{{ item[4]}}</span></p>
-									<form action="{{ url_for('shoppingCartPage') }}" method="POST">
-										<input name="restaurant" value="{{ item[1] }}" style="display: none;">
-                                        <input name="dishname" value="{{ item[0] }}" style="display: none;">
-                                        <input name="price" value="{{ item[4] }}" style="display: none;">
-                                        <input name="img_res" value="{{ item[6] }}" style="display: none;">
-                                        <input type="submit" name="action" value="加入购物车" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
 
-                                    </form>
+                                    <p>数量：{{item[4] }}</p>
+									<p style="margin-left: 322px;">价格：<span class="price cursive-font">￥{{ item[3]}}</span></p>
+
+									<a href="settlement">加入购物车</a>
                                     <br/>
 								</div>
 							</div>

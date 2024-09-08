@@ -42,7 +42,6 @@
                             <ul class="dropdown">
 								<li><a href="ModifyPersonalInfo">修改个人信息</a></li>
 								<li><a href="ModifyPassword">修改密码</a></li>
-                                <li><a href="OrderPage">我的订单</a></li>
                             </ul>
 						</li>
 						<li><a href="index">返回首页</a></li>
@@ -77,19 +76,13 @@
 		<div class="col-md-4 col-sm-6">
 			<div class="feature-center animate-box" data-animate-effect="fadeIn">
 				<span class="icon">
-					<i class="ti-receipt"></i>
-				</span>
-				<a href="OrderPage" style="text-decoration: none;"><h3>我的订单</h3></a>
-				<p>My orders</p>
-			</div>
-		</div>
-		<div class="col-md-4 col-sm-6">
-			<div class="feature-center animate-box" data-animate-effect="fadeIn">
-				<span class="icon">
 					<i class="ti-comment-alt"></i>
 				</span>
-				<input type="radio" name="order" value="MyComments"><a href="MyComments">开始接单</a>
-				<p>Order Receiving</p>
+				<form action="{{ url_for('DPpersonalPage') }}" method="post">
+					<input type="checkbox" name="order" value="1" {% if type == 1 %} checked {% endif %} ><a>开始接单</a>
+					<p>Order Receiving</p>
+					<input type="submit" name="action" value="确定" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+				</form>
 			</div>
 		</div>
 
