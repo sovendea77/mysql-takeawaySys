@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>查看用户</title>
+    <title>查看外卖员</title>
     <!-- <link rel="stylesheet" href="static/css/test.css" type="text/css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/test.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
@@ -33,21 +33,20 @@
 </head>
 <body>
 	<div class="gtco-loader"></div>
-
 	<div id="page">
 		<div class="navbkg" >
 			<nav class="gtco-nav" role="navigation" style="background-color: rgba(0, 0, 0, 0.8);">
 				<div class="gtco-container">
 					<div class="row">
 						<div class="col-sm-4 col-xs-12">
-							<div id="gtco-logo"><a href="adminUserList">用户信息<em></em></a></div>
+							<div id="gtco-logo"><a href="adminRestList">外卖员信息<em></em></a></div>
                 		</div>
 						<div class="col-xs-8 text-right menu-1">
 							<ul>
 								<li><a href="adminCommentList">查看评论</a></li>
-								<li><a href="adminRestList">商家列表</a></li>
-								<li><a href="adminDeliList">外卖员信息</a></li>
-								<li><a href="adminOrderList">待退款订单</a></li>
+								<li><a href="adminUserList">待退款订单</a></li>
+								<li><a href="adminDeliList">用户信息</a></li>
+								<li><a href="adminOrderList">商家列表</a></li>
 								<li><a href="index">退出登录</a></li>
                     		</ul>
                 		</div>
@@ -56,84 +55,7 @@
 			</nav>
 		</div>
 
-	<div class="gtco-section">
-		<div class="gtco-container">
-			<div class="row">
-				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-					<h2 class="cursive-font primary-color">外卖员信息</h2>
-				</div>
-			</div>
-			<div >
-				{% if messages == "done" %}
-				<table>
-    <thead>
-        <tr>
-            <th style="width:200px;">外卖员姓名</th>
-			<th style="width:200px;">密码</th>
-            <th style="width:400px;">联系电话</th>
-            <th style="width:200px;">位置信息</th>
-			<th style="width:200px;">是否已送达</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in result %}
-        <tr>
-            <td style="width:200px;">
-                {{ item[0] }}
-            </td>
-            <td style="width:400px;">
-                {{ item[1] }}
-            </td>
-            <td style="width:200px;">
-                {{ item[2] }}
-            </td>
-            <td style="width:200px;">
-                {{ item[3] }}
-            </td>
-			<td style="width:200px;">
-                {{ item[4] }}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-				{% endif %}
-
-
-
-
-			</div>
-
-		</div>
 	</div>
-	</div>
-
-	<footer id="gtco-footer" role="contentinfo" style="background-image: url(static/images/img_bg_1.jpg)" data-stellar-background-ratio="0.5">
-		<div class="overlay"></div>
-		<div class="gtco-container">
-			<div class="row row-pb-md">
-
-				<div class="col-md-12 text-center">
-					<div class="gtco-widget">
-						<h3>社区分享</h3>
-						<ul class="gtco-social-icons">
-							<li><a href="#"><i class="icon-twitter"></i></a></li>
-							<li><a href="#"><i class="icon-facebook"></i></a></li>
-							<li><a href="#"><i class="icon-linkedin"></i></a></li>
-							<li><a href="#"><i class="icon-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="col-md-12 text-center copyright">
-					<p><big class="block">&copy; 2020 ZhangHongYu SWPU数据库原理及应用大作业</big>
-				</div>
-
-			</div>
-
-		</div>
-	</footer>
-
 	<!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
 	<!-- jQuery Easing -->
@@ -159,6 +81,6 @@
 
 
 	<!-- Main -->
-	<script src="static/js/main.js"></script>
+	<script src="static/js/main.js"></script>Y
 </body>
 </html>
