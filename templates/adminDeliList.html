@@ -90,9 +90,12 @@
             <td style="width:200px;">
                 {{ item[3] }}
             </td>
-			<td style="width:200px;">
-                {{ item[4] }}
-            </td>
+
+			{% if item[4] == 1 %}
+			<td style="width:200px;"> 是 </td>
+			{% else %}
+			<td style="width:200px;"> 否 </td>
+			{% endif %}
         </tr>
         {% endfor %}
     </tbody>
