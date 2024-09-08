@@ -192,7 +192,7 @@ def logInPage():
                 msg = "fail1"
             return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
 
-        elif userRole == 'shop':
+        elif userRole == 'RESTAURANT':
             cursor = db.cursor()
             try:
                 cursor.execute("use test2")
@@ -202,6 +202,7 @@ def logInPage():
             cursor.execute(sql)
             db.commit()
             res = cursor.fetchall()
+            print(res)
             num = 0
             for row in res:
                 num = num + 1
