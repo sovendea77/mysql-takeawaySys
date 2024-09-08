@@ -704,7 +704,7 @@ def OrderPage():
             print("Error: unable to use database!")
 
         # 查询未完成订单数量,status = 1 /2 /3 /4
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
+        unfinished_sql = "SELECT * FROM orders WHERE userID = %s AND status in (1, 2, 3, 4)" % username
         cursor.execute(unfinished_sql)
         unfinished_res = cursor.fetchall()
         print(unfinished_res)
@@ -712,7 +712,7 @@ def OrderPage():
         print(f"未完成订单数量{notFinished_num}")
 
         # 查询已完成订单数量 status = 5 /7 /8
-        finished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 5 or status = 7 or status = 8)" % username
+        finished_sql = "SELECT * FROM orders WHERE userID = %s AND status in (5, 7 ,8)" % username
         cursor.execute(finished_sql)
         finished_res = cursor.fetchall()
         print(finished_res)
@@ -720,20 +720,36 @@ def OrderPage():
         print(f"已完成订单数量{finished_num}")
 
         # 查询待退款订单数量 status = 6
-        pending_refund_sql = "SELECT * FROM orders WHERE userID = '%s' AND status = 6" % username
+        pending_refund_sql = "SELECT * FROM orders WHERE userID = %s AND status = 6" % username
         cursor.execute(pending_refund_sql)
         pending_refund_res = cursor.fetchall()
         print(pending_refund_res)
         pending_refund_num = len(pending_refund_res)
-        print(f"已完成订单数量{pending_refund_num}")
+        print(f"待退款订单数量{pending_refund_num}")
 
-        if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
+        # 展示订单的菜品图片
+        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
+        cursor.execute(orderdishes_sql)
+        orderdishes_median = cursor.fetchall()
+        print(orderdishes_median)
+        orderdishes_res = []
+        for od in orderdishes_median:
+            od_list = list(od)
+            od_list[2] = "static/images/" + od_list[2]
+            orderdishes_res.append(od_list)
+        print(f"订单菜品新列表：{orderdishes_res}")
+
+
+        print(f"展示订单的菜品图片，此处为调试语句{len(orderdishes_median)}")
+
+        if len(unfinished_res) and len(finished_res) and len(pending_refund_res) and len(orderdishes_median):
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username,
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
         else:
             print("NULL")
@@ -742,6 +758,7 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   orderdishes_result=orderdishes_median,
                                    messages=msg)
 
     elif request.form["action"] == '确认收货':
@@ -761,14 +778,14 @@ def OrderPage():
         db.commit()
 
         # 查询未完成订单数量
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
+        unfinished_sql = "SELECT * FROM orders WHERE userID = %s AND status in (1, 2, 3, 4)" % username
         cursor.execute(unfinished_sql)
         unfinished_res = cursor.fetchall()
         print(unfinished_res)
         notFinished_num = len(unfinished_res)
         print(f"未完成订单数量{notFinished_num}")
         # 查询已完成订单数量
-        finished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 5 or status = 7 or status = 8)" % username
+        finished_sql = "SELECT * FROM orders WHERE userID = %s AND status in (5, 7 ,8)" % username
         cursor.execute(finished_sql)
         finished_res = cursor.fetchall()
         print(finished_res)
@@ -776,7 +793,7 @@ def OrderPage():
         print(f"已完成订单数量{finished_num}")
 
         # 查询待退款订单数量
-        pending_refund_sql = "SELECT * FROM orders WHERE userID = '%s' AND status = 6" % username
+        pending_refund_sql = "SELECT * FROM orders WHERE userID = %s AND status = 6" % username
         cursor.execute(pending_refund_sql)
         pending_refund_res = cursor.fetchall()
         print(pending_refund_res)
@@ -824,7 +841,7 @@ def OrderPage():
         print("committed")
 
         # 查询未完成订单数量
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status in (1, 2, 3, 4)" % username
         cursor.execute(unfinished_sql)
         unfinished_res = cursor.fetchall()
         print(unfinished_res)
