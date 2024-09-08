@@ -242,7 +242,7 @@ def adminRestListPage():
             print("Error: unable to use database!")
 
         # 查询
-        sql = "SELECT * FROM RESTAURANT"
+        sql = "SELECT ShopID,ShopPassword,ShopAddress,ShopPhone,Shop.img_res from Shop"
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
@@ -266,19 +266,16 @@ def adminRestListPage():
             print("Error: unable to use database!")
         # TODO: 点击移除后显示移除成功，但数据库里没有删掉
         # 删除DISHES的
-        sql1 = "DELETE FROM DISHES WHERE restaurant = '{}'".format(RESTName)
+        sql1 = "DELETE FROM Dishes WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql1)
         db.commit()
         # 删除订单表里的
-        sql2 = "DELETE FROM ORDER_COMMENT WHERE restaurant = '{}'".format(RESTName)
+        sql2 = "DELETE FROM Orders WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql2)
         db.commit()
-        # 删除shoppingCart的
-        sql3 = "DELETE FROM WHERE restaurant = '{}'".format(RESTName)
-        cursor.execute(sql3)
-        db.commit()
-        # 删除restaurant的
-        sql4 = "DELETE FROM RESTAURANT WHERE username = '{}'".format(RESTName)
+
+        # 删除shop的
+        sql4 = "DELETE FROM Shop WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql4)
         db.commit()
         print(sql4)
@@ -304,7 +301,7 @@ def adminCommentPage():
             print("Error: unable to use database!")
 
         # 查询
-        sql = "SELECT * FROM ORDER_COMMENT WHERE isFinished = 1 and text <> ''"
+        sql = "SELECT Orders.OrderID,Orders.UserID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.Status in(5,7,8) AND Comments.Description <> ''"
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
@@ -317,27 +314,7 @@ def adminCommentPage():
             print("NULL")
             msg = "none"
             return render_template('adminCommentList.html', username=username, messages=msg)
-    elif request.form["action"] == "按评分升序排列":
-        db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE isFinished = 1 AND text is not null Order BY c_rank"
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        # print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('adminCommentList.html', username=username, result=res, messages=msg)
-        else:
-            print("NULL")
-            msg = "none"
-        return render_template('adminCommentList.html', username=username, messages=msg)
 
 # 用户登录后显示商家列表
 @app.route('/UserRestList',methods=['GET', 'POST'])
@@ -509,7 +486,7 @@ def ResCommentList():
     except:
         print("Error: unable to use database!")
     # 查询
-    sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' AND isFinished = 1 AND text <> '' " % restaurant
+    sql = "SELECT Orders.OrderID,Orders.UserID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,7,8) AND Comments.Description <> '' " % restaurant
     cursor.execute(sql)
     res = cursor.fetchall()
     # print(res)
@@ -1102,7 +1079,7 @@ def MerchantMenu():
                 cursor.execute("use appDB")
             except:
                 print("Error: unable to use database!")
-            sql = "DELETE FROM DISHES where dishname = '{}' and restaurant = '{}'".format(dishname,rest)
+            sql = "DELETE FROM Dishes where Dishes.DishName = '{}' and Dishes.ShopID = '{}'".format(dishname,rest)
             print(sql)
             try:
                 cursor.execute(sql)
@@ -1114,7 +1091,7 @@ def MerchantMenu():
                 print("菜品删除失败")
                 dmsg = "fail"
             return render_template('MerchantMenu.html', dishname=dishname, rest=rest, dmessages=dmsg)
-        elif request.form["action"] == "按销量排序":
+        elif request.form["action"] == "按数量排序":
             db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
             cursor = db.cursor()
             try:
@@ -1122,7 +1099,7 @@ def MerchantMenu():
             except:
                 print("Error: unable to use database!")
 
-            sql = "SELECT * FROM DISHES WHERE restaurant = '%s' Order BY sales DESC" % username
+            sql = "SELECT Dishes.DishName,Dishes.ShopID,DishDescription,DishPrice,Dishes.Quantity,Dishes.imgsrc FROM Dishes WHERE Dishes.ShopID = '%s' Order BY Dishes.Quantity DESC" % username
             cursor.execute(sql)
             res = cursor.fetchall()
             print(res)
@@ -1143,7 +1120,7 @@ def MerchantMenu():
             except:
                 print("Error: unable to use database!")
 
-            sql = "SELECT * FROM DISHES WHERE restaurant = '%s' Order BY price DESC" % username
+            sql = "SELECT Dishes.DishName,Dishes.ShopID,DishDescription,DishPrice,Dishes.Quantity,Dishes.imgsrc FROM Dishes WHERE Dishes.ShopID = '%s' Order BY Dishes.DishPrice DESC" % username
             cursor.execute(sql)
             res = cursor.fetchall()
             print(res)
@@ -1168,38 +1145,23 @@ def MenuModify():
         dishname = request.form['dishname']#传递过去菜品名
         rest = request.form['restaurant']#传递过去商家名
         dishinfo = request.form['dishinfo']
-        nutriention = request.form.get('nutriention')
         price = request.form.get('price')
-        isSpecialty = request.form.get('isSpecialty')
+        num = request.form.get('num')
         #imagesrc = request.form['imagesrc']
         print(dishname)
-        print(isSpecialty)
-        print(type(isSpecialty))
+
         
 		
-        return render_template('MenuModify.html', dishname=dishname, rest=rest, dishinfo=dishinfo, nutriention=nutriention, price=price, username=username, messages=msg,isSpecialty=isSpecialty)
+        return render_template('MenuModify.html', dishname=dishname, rest=rest, dishinfo=dishinfo,  price=price, num=num,username=username, messages=msg)
     elif request.form["action"] == "提交修改":
 
         dishname = request.form.get('dishname')
         rest = request.form.get('rest')
-
         dishinfo = request.form['dishinfo']
-        nutriention = request.form.get('nutriention')
         price = request.form.get('price')
-        isSpecialty = int(request.form.get('isSpecialty'))
-        f = request.files['imagesrc']
-        filename = ''
-		
-        if f !='' and allowed_file(f.filename):
-            filename = secure_filename(f.filename)
-			
-        if filename != '':
-            f.save('static/images/' + filename)
-        imgsrc = 'static/images/' + filename
-		
-		
-        print(isSpecialty)
-        print(type(isSpecialty))
+        num = request.form.get('num')
+
+
         db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
@@ -1207,10 +1169,7 @@ def MenuModify():
         except:
             print("Error: unable to use database!")
 
-        if filename == '':
-            sql = "Update DISHES SET dishinfo = '{}', nutriention = '{}', price = {} , isSpecialty = {} where dishname = '{}' and restaurant = '{}'".format(dishinfo,nutriention,price,isSpecialty,dishname,rest)
-        else:
-            sql = "Update DISHES SET dishinfo = '{}', nutriention = '{}', price = {} ,imgsrc = '{}', isSpecialty = {} where dishname = '{}' and restaurant = '{}'".format(dishinfo,nutriention,price,imgsrc,isSpecialty,dishname,rest)
+        sql = "Update Dishes SET DishDescription = '{}', DishPrice = {} ,Dishes.Quantity={}  where DishName = '{}'".format(dishinfo,price,num,dishname)
         print(sql)
 		
         try:
@@ -1223,6 +1182,7 @@ def MenuModify():
             print("菜品信息修改失败失败")
             msg = "fail"
         return render_template('MenuModify.html',dishname=dishname, rest=rest, username=username, messages=msg)
+
 @app.route('/MenuAdd',methods=['GET','POST'])
 def MenuAdd():
     msg = ""
@@ -1233,18 +1193,13 @@ def MenuAdd():
         rest = request.form['restaurant']#传递过去商家名
         return render_template('MenuAdd.html',rest=rest)
     elif request.form["action"] == "确认增加":
+
         dishname = request.form.get('dishname')
         rest = request.form.get('rest')
         dishinfo = request.form.get('dishinfo')
-        nutriention = request.form.get('nutriention')
         price = request.form.get('price')
-        f = request.files['imagesrc']
-        print(f)
-        isSpecialty = int(request.form.get('isSpecialty'))
-        if f and allowed_file(f.filename):
-            filename = secure_filename(f.filename)
-            f.save('static/images/' + filename)
-        imgsrc = 'static/images/' + filename
+        numb = request.form.get('num')
+
         db = pymysql.connect(host="localhost", user="root", password='123456', database="appDB", charset='utf8')
 
         cursor = db.cursor()
@@ -1252,7 +1207,8 @@ def MenuAdd():
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
-        sql1 = "SELECT * from DISHES where dishname = '{}' ".format(dishname)
+
+        sql1 = "SELECT * FROM Dishes where Dishes.DishName = '{}' ".format(dishname)
         cursor.execute(sql1)
         db.commit()
         res1 = cursor.fetchall()
@@ -1264,7 +1220,7 @@ def MenuAdd():
             print("失败！该菜品已经添加过！")
             msg = "fail1"
         else:
-            sql2 = "insert into DISHES  values ('{}', '{}','{}', '{}',{}, {},'{}', {}) ".format(dishname,rest,dishinfo,nutriention,price,0,imgsrc,isSpecialty)
+            sql2 = "insert into Dishes(DishPrice,DishName,DishDescription,ShopID,Dishes.Quantity)  values ('{}','{}','{}',{}, {}) ".format(price,dishname,dishinfo,rest,numb)
             print(sql2)
             try:
                 cursor.execute(sql2)
@@ -1359,7 +1315,7 @@ def MerchantViewPerInfo():
         except:
             print("Error: unable to use database!")
         # 查询
-        sql = "SELECT ShopID,ShopPassword,ShopAddress,ShopPhone,Shop.img_res from Shop where ShopID = '{}'" .format(username)
+        sql = "SELECT ShopID,ShopPassword,ShopAddress,ShopPhone,Shop.img_res,Shop.Turnover from Shop where ShopID = '{}'" .format(username)
 
         cursor.execute(sql)
         res = cursor.fetchall()
@@ -1387,7 +1343,6 @@ def MerchantModifyPerInfo():
         # username = request.form['username']
         address = request.form['address']
         phonenum = request.form['phonenum']
-		
         f = request.files['imagesrc']
         filename = ''
 		
@@ -1409,10 +1364,10 @@ def MerchantModifyPerInfo():
             print("Error: unable to use database!")
 			
         if filename == '':	
-            sql = "Update {} SET address = '{}', phone = '{}' where username = '{}'".format(userRole, address, phonenum,
+            sql = "Update Shop SET ShopAddress = '{}', ShopPhone = '{}' where ShopID = '{}'".format(address, phonenum,
                                                                                         username)
         else:
-            sql = "Update {} SET address = '{}', phone = '{}',img_res = '{}' where username = '{}'".format(userRole, address, phonenum, imgsrc,
+            sql = "Update Shop SET ShopAddress = '{}', ShopPhone = '{}',img_res = '{}' where ShopID = '{}'".format(address, phonenum, imgsrc,
                                                                                         username)
         try:
             cursor.execute(sql)
@@ -1445,7 +1400,7 @@ def MerModifyPassword():
                 cursor.execute("use appDB")
             except:
                 print("Error: unable to use database!")
-            sql = "Update {} SET password = '{}' where username = '{}'".format(userRole, psw1, username)
+            sql = "Update Shop SET ShopPassword = '{}' where ShopID = '{}'".format(psw1, username)
             try:
                 cursor.execute(sql)
                 db.commit()
