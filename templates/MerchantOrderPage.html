@@ -65,14 +65,7 @@
 					<!-- <p>Dignissimos asperiores vitae velit veniam totam fuga molestias accusamus alias autem provident. Odit ab aliquam dolor eius.</p> -->
 				</div>
 			</div>
-			<!-- TODO: 此处还想加一个按照时间顺序或价格排列 -->
-			<div class="selectcondition">
-				<form action="{{ url_for('MerchantOrderPage') }}" method="post">
-					<input type="submit" name="action" value="按时间排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<input type="submit" name="action" value="按价格排序" style="color: white; font-size: 16px; outline:none; border:0px; background-color: #FBB448; border-radius: 10px;">
-					<span class="badge" style="float: right;">{{ notFinishedNum }}</span><input type="submit" name="action" value="未完成订单" style="background-color: transparent; color: #FBB448; float: right; font-size: 16px; outline:none; border:0px;">
-				</form>
-			</div>
+
 			<br/><br/>
 					<!-- 展示我的全部订单 -->
 

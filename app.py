@@ -161,10 +161,10 @@ def logInPage():
                 msg = "fail1"
             return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
 
-        elif userRole == 'RESTAURANT':
+        elif userRole == 'shop':
             cursor = db.cursor()
             try:
-                cursor.execute("use appDB")
+                cursor.execute("use test2")
             except:
                 print("Error: unable to use database!")
             sql = "SELECT ShopID,ShopPassword,ShopAddress,ShopPhone,Shop.img_res from Shop where ShopID = '{}' and ShopPassword='{}'".format(username, password)
@@ -688,7 +688,6 @@ def ModifyPassword():
 
 
 # 用户订单页面
-# 用户订单页面
 @app.route('/OrderPage', methods=['GET', 'POST'])
 def OrderPage():
     msg = ""
@@ -704,15 +703,15 @@ def OrderPage():
         except:
             print("Error: unable to use database!")
 
-        # 查询未完成订单数量
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status != 5 and status != 7 and status != 8" % username
+        # 查询未完成订单数量,status = 1 /2 /3 /4
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
         cursor.execute(unfinished_sql)
         unfinished_res = cursor.fetchall()
         print(unfinished_res)
         notFinished_num = len(unfinished_res)
         print(f"未完成订单数量{notFinished_num}")
 
-        # 查询已完成订单数量
+        # 查询已完成订单数量 status = 5 /7 /8
         finished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 5 or status = 7 or status = 8)" % username
         cursor.execute(finished_sql)
         finished_res = cursor.fetchall()
@@ -720,18 +719,30 @@ def OrderPage():
         finished_num = len(finished_res)
         print(f"已完成订单数量{finished_num}")
 
-        if len(unfinished_res) and len(finished_res):
+        # 查询待退款订单数量 status = 6
+        pending_refund_sql = "SELECT * FROM orders WHERE userID = '%s' AND status = 6" % username
+        cursor.execute(pending_refund_sql)
+        pending_refund_res = cursor.fetchall()
+        print(pending_refund_res)
+        pending_refund_num = len(pending_refund_res)
+        print(f"已完成订单数量{pending_refund_num}")
+
+        if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username,
-                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
-                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
         else:
             print("NULL")
             msg = "none"
             return render_template('OrderPage.html', username=username,
-                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
-                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
 
     elif request.form["action"] == '确认收货':
         print("进入确认收货按钮函数")
@@ -750,7 +761,7 @@ def OrderPage():
         db.commit()
 
         # 查询未完成订单数量
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status != 5 and status != 7 and status != 8" % username
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
         cursor.execute(unfinished_sql)
         unfinished_res = cursor.fetchall()
         print(unfinished_res)
@@ -764,21 +775,94 @@ def OrderPage():
         finished_num = len(finished_res)
         print(f"已完成订单数量{finished_num}")
 
-        if len(unfinished_res) and len(finished_res):
+        # 查询待退款订单数量
+        pending_refund_sql = "SELECT * FROM orders WHERE userID = '%s' AND status = 6" % username
+        cursor.execute(pending_refund_sql)
+        pending_refund_res = cursor.fetchall()
+        print(pending_refund_res)
+        pending_refund_num = len(pending_refund_res)
+        print(f"已完成订单数量{pending_refund_num}")
+
+        if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
             msg = "done"
             print(msg)
             return render_template('OrderPage.html', username=username,
-                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
-                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
         else:
             print("NULL")
             msg = "none"
             return render_template('OrderPage.html', username=username,
-                                   unfinished_result=unfinished_res, finished_result=finished_res, messages=msg,
-                                   notFinishedNum=notFinished_num, finishedNum=finished_num)
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
+    # 跳转到写评价页面
     elif request.form["action"] == '去评价':
         print("跳转到评价页面")
         return render_template('WriteComments.html', username=username, messages=msg)
+
+    # 申请退款，即status=6
+    elif request.form["action"] == '申请退款':
+        print("进入申请退款函数")
+        db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use test2")
+        except:
+            print("Error: unable to use database!")
+        print("用户要申请退款")
+        orderID = request.form.get('orderID')
+        print(f"orderID为{orderID}")
+        # 更新订单状态，
+        sql1 = "UPDATE orders SET status = 6 where orderID = %s"
+        cursor.execute(sql1, (orderID,))
+        print("execute")
+        db.commit()
+        print("committed")
+
+        # 查询未完成订单数量
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
+        cursor.execute(unfinished_sql)
+        unfinished_res = cursor.fetchall()
+        print(unfinished_res)
+        notFinished_num = len(unfinished_res)
+        print(f"未完成订单数量{notFinished_num}")
+        # 查询已完成订单数量
+        finished_sql = ("SELECT * FROM orders WHERE userID = '%s' AND "
+                        "(status = 5 or status = 7 or status = 8)") % username
+        cursor.execute(finished_sql)
+        finished_res = cursor.fetchall()
+        print(finished_res)
+        finished_num = len(finished_res)
+        print(f"已完成订单数量{finished_num}")
+
+        # 查询待退款订单数量
+        pending_refund_sql = "SELECT * FROM orders WHERE userID = '%s' AND status = 6" % username
+        cursor.execute(pending_refund_sql)
+        pending_refund_res = cursor.fetchall()
+        print(pending_refund_res)
+        pending_refund_num = len(pending_refund_res)
+        print(f"已完成订单数量{pending_refund_num}")
+
+        if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
+            msg = "done"
+            print(msg)
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('OrderPage.html', username=username,
+                                   unfinished_result=unfinished_res, finished_result=finished_res,
+                                   pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
+                                   notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   messages=msg)
 
 
 # 我的评论页面
@@ -795,14 +879,14 @@ def MyCommentsPage():
             cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
-        # 查询未完成订单
+        # 查询已完成订单(此处未改)
         unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status != 5 and status != 7 and status != 8" % username
         cursor.execute(unfinished_sql)
         unfinished_res = cursor.fetchall()
         print(unfinished_res)
         notFinished_num = len(unfinished_res)
         print(f"未完成订单数量{notFinished_num}")
-        if len(unfinished_res) :
+        if len(unfinished_res):
             msg = "done"
             print(msg)
             return render_template('MyComments.html', username=username,
@@ -823,98 +907,40 @@ def MyCommentsPage():
 def WriteCommentsPage():
     msg=""
     if request.method == 'GET':
+        msg = ""
         # 连接数据库，默认数据库用户名root，密码空
         db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appDB")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
-        # 查询未完成订单数量
-        # presql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 0" % username
-        # cursor.execute(presql)
-        # res1 = cursor.fetchall()
-        # notFinishedNum = len(res1)
-        # 查询其他信息
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text = '' " % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        # print(res)
-        # print(len(res))
-        if len(res):
+        # 查询未完成订单
+        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
+        cursor.execute(unfinished_sql)
+        unfinished_res = cursor.fetchall()
+        print(unfinished_res)
+        notFinished_num = len(unfinished_res)
+        print(f"未完成订单数量{notFinished_num}")
+        if len(unfinished_res):
             msg = "done"
             print(msg)
-            return render_template('WriteComments.html', username=username, result=res, messages=msg)
+            return render_template('WriteComments.html', username=username,
+                                   unfinished_result=unfinished_res, messages=msg,
+                                   notFinishedNum=notFinished_num)
         else:
-            print("WriteCommentsPage - GET - NULL")
+            print("NULL")
             msg = "none"
-            return render_template('WriteComments.html', username=username, messages=msg)
-    elif request.form["action"] == "按交易时间排序":
-        # TODO: 排序之后显示的是空的，不显示的问题没有解决
-        db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
-        print(username)
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text = '' Order BY transactiontime DESC" % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('WriteComments.html', username=username, result=res, messages=msg)
-        else:
-            print("WriteCommentsPage - 按交易时间排序 -NULL")
-            msg = "none"
+            return render_template('WriteComments.html', username=username,
+                                   unfinished_result=unfinished_res, messages=msg,
+                                   notFinishedNum=notFinished_num)
+    elif request.method == 'POST':
+        comment = request.form['comment']
+        # 第一，WriteComments中使用for循环来展示订单，导致评论只输入一个，待评价的订单就没了
+        # 第二，修改orders的stastu状态为已评价
+        print(comment)
         return render_template('WriteComments.html', username=username, messages=msg)
-    elif request.form["action"] == "按价格排序":
-        db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text = '' Order BY cost ASC" % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('WriteComments.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
-        else:
-            print("WriteCommentsPage - 按价格排序 - NULL")
-            msg = "none"
-        return render_template('WriteComments.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
-    elif request.form["action"] == "未完成订单":
-        db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
-
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 0 AND text = '' " % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('WriteComments.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=len(res))
-        else:
-            print("WriteCommentsPage - 未完成订单 - NULL")
-            msg = "none"
-        return render_template('WriteComments.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
     else:
         return render_template('WriteComments.html', username=username, messages=msg)
 
@@ -1404,6 +1430,7 @@ def MerModifyPassword():
             msg = "not equal"
             return render_template('MerchantModifyPwd.html', messages=msg, username=username)
 
+
 # 商家查看订单
 @app.route('/MerchantOrderPage', methods=['GET', 'POST'])
 def MerchantOrderPage():
@@ -1415,7 +1442,7 @@ def MerchantOrderPage():
         db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use appDB")
+            cursor.execute("use test2")
         except:
             print("Error: unable to use database!")
         # 查询未完成订单数量
