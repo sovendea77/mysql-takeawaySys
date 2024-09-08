@@ -97,6 +97,7 @@
 														<label for="activities">身份</label><br>
     													<input type="radio" name="userRole" value="RESTAURANT" />商家用户
 														<input type="radio" name="userRole" value="CUSTOMER" checked />买家用户<br>
+														<input type="radio" name="userRole" value="DeliveryPerson"/>外卖员用户<br>
 													</div>
 												</div>
 												<div class="row form-group">
@@ -138,6 +139,10 @@
 												<script>alert("买家用户注册成功！")</script>
 											{% elif messages == "fail2" %}
                                                 <script>alert("注册失败！买家已注册。")</script>
+											{% elif messages == "done3" %}
+												<script>alert("外卖员用户注册成功！")</script>
+											{% elif messages == "fail3" %}
+                                                <script>alert("注册失败！外卖员已注册。")</script>
 											{% endif %}
 											<div class="col-md-12">
 											</div>

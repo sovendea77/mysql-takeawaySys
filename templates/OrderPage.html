@@ -96,7 +96,8 @@
 									<div class="action-buttons">
 										<input type="hidden" name="orderID" value="{{order[0]}}">
 			                			<button type="submit" name="action" value="申请退款" class="confirm-button">申请退款</button>
-										<button type="submit" name="action" value="去评价" class="confirm-button">去评价</button>
+										<button><a href="http://localhost:9090/WriteComments">去评价</a></button>
+
 			            			</div>
 								</form>
 					    		</li>
@@ -104,7 +105,7 @@
 
 					    {% endfor %}
 					    {% else %}
-					    <li>没有未完成的订单。</li>
+					    <li>没有已完成的订单。</li>
 					    {% endif %}
 					</ul>
 			    </div>
