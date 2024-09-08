@@ -631,7 +631,7 @@ def shopping():
     global yhq
     if request.method == 'GET':
         #print("myOrder-->GET")
-        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -668,7 +668,7 @@ def shopping():
         new_status = request.form.get('new_status')
 
         # 连接数据库
-        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -701,7 +701,7 @@ def shopping():
         yhq = request.form.get('yhq')
         #order_id = request.form.get('order_id')
         print(order_id)
-        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
