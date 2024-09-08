@@ -333,7 +333,7 @@ def adminUserPage():
             print("Error: unable to use database!")
 
         # 查询
-        sql = "SELECT * FROM RESTAURANT"
+        sql = "SELECT * FROM Users"
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
@@ -621,45 +621,23 @@ def ResCommentList():
 def page_not_found(error):
     return render_template("404.html"), 404
 
-
+order_id=None
+yhq=None
 # 购物车
 @app.route('/settlement',methods=['GET', 'POST'])
 def shopping():
     msg = ""
-    if request.method == 'POST':
-
-        order_id = request.form.get('order_id')
-        new_status = request.form.get('new_status')
-
-        # 连接数据库
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
-        try:
-            with db.cursor() as cursor:
-
-                sql = "insert into OrdersDishes(OrderNumber, DishID) values({},{})".format(int(order_id),int(new_status))
-                cursor.execute(sql)
-                db.commit()
-                msg = "Order status updated successfully!"
-
-
-        except pymysql.MySQLError as e:
-            print(f"Error: {e}")
-            msg = "Error updating order status!"
-
-        finally:
-            db.close()
-
-        return redirect(url_for('shopping'))
+    global order_id
+    global yhq
     if request.method == 'GET':
         #print("myOrder-->GET")
-        db =  pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB",charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
-
-        sql ="insert into Orders(ShopID,UserID) values('{}' ,'{}')".format(restaurant,username)
+        sql = "insert into Orders(ShopID,UserID) values('{}' ,'{}')".format(restaurant, username)
         cursor.execute(sql)
         db.commit()
         # 查询
@@ -671,18 +649,83 @@ def shopping():
         res2 = cursor.fetchall()
         print(res1)
         print(res2)
+        order_id = res2[0][0]
         # print(len(res))
         if len(res1) != 0 and len(res2) != 0:
             msg = "done"
             print(msg)
             print(len(res1))
-            return render_template('settlement.html', username=username, result1=res1, result2=res2,messages=msg)
+            return render_template('settlement.html', username=username, result1=res1, messages=msg)
         else:
             print("NULL")
             msg = "none"
             return render_template('settlement.html', username=username, messages=msg)
 
 
+    elif request.form["action"] == "选择":
+
+        #order_id = request.form.get('order_id')
+        new_status = request.form.get('new_status')
+
+        # 连接数据库
+        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        sql = "insert into OrdersDishes(OrderNumber, DishID) values({},{})".format(int(order_id),int(new_status))
+        cursor.execute(sql)
+        db.commit()
+        msg = "Order status updated successfully!"
+        sql = "SELECT * FROM Dishes WHERE ShopID = '%s'" % restaurant
+        cursor.execute(sql)
+        res1 = cursor.fetchall()
+
+        # print(len(res))
+        if len(res1) != 0 :
+            msg = "done"
+            print(msg)
+            print(len(res1))
+            return render_template('settlement.html', username=username, result1=res1,
+                                           messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('settlement.html', username=username, messages=msg)
+
+
+
+    elif request.form["action"] == "提交":
+        yhq = request.form.get('yhq')
+        #order_id = request.form.get('order_id')
+        print(order_id)
+        db = pymysql.connect(host="localhost", user="root", password="18715218029zxy", database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+        sql = "update Orders set CouponID={} where OrderID={}".format(int(yhq), int(order_id))
+        cursor.execute(sql)
+        db.commit()
+        msg = "Order status updated successfully!"
+        sql = "SELECT * FROM Dishes WHERE ShopID = '%s'" % restaurant
+        cursor.execute(sql)
+        res1 = cursor.fetchall()
+
+        # print(len(res))
+        if len(res1) != 0 :
+            msg = "done"
+            print(msg)
+            print(len(res1))
+            return render_template('settlement.html', username=username, result1=res1,
+                                   messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('settlement.html', username=username, messages=msg)
 
     else:
         print("咋回事")
@@ -691,6 +734,7 @@ def shopping():
 @app.route('/jiesuan',methods=['GET', 'POST'])
 def js():
     if request.method == 'GET':
+        print(order_id)
         #print("myOrder-->GET")
         db =  pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB",charset='utf8')
         cursor = db.cursor()
@@ -698,8 +742,11 @@ def js():
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
+        sql = "call settlement({},{})".format(int(order_id), int(yhq))
+        cursor.execute(sql)
+        db.commit()
         # 查询
-        sql = "SELECT * FROM RESTAURANT"
+        sql = "SELECT * FROM Orders WHERE OrderID={}".format(int(order_id))
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)

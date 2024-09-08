@@ -68,10 +68,11 @@
 				<table>
     <thead>
         <tr>
-            <th style="width:200px;">商店名</th>
+            <th style="width:200px;">ID</th>
+            <th style="width:400px;">地址</th>
             <th style="width:200px;">密码</th>
-            <th style="width:200px;">地址</th>
-            <th style="width:400px;">联系电话</th>
+            <th style="width:200px;">联系电话</th>
+			<th style="width:200px;">余额</th>
         </tr>
     </thead>
     <tbody>
@@ -80,14 +81,17 @@
             <td style="width:200px;">
                 {{ item[0] }}
             </td>
-            <td style="width:200px;">
+            <td style="width:400px;">
                 {{ item[1] }}
             </td>
             <td style="width:200px;">
-                {{ item[2] }}
-            </td>
-            <td style="width:400px;">
                 {{ item[3] }}
+            </td>
+            <td style="width:200px;">
+                {{ item[4] }}
+            </td>
+			<td style="width:200px;">
+                {{ item[5] }}
             </td>
         </tr>
         {% endfor %}
@@ -95,12 +99,6 @@
 </table>
 
 
-				{% elif messages == "none" %}
-					<div class="alert alert-danger" role="alert">暂无商家</div>
-				{% elif messages == "delete" %}
-					<script>alert("移除成功！")</script>
-					<script type='text/javascript'>window.location.href='adminRestList'</script>
-				{% endif %}
 
 
 			</div>
