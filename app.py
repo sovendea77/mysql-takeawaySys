@@ -303,27 +303,12 @@ def adminRestListPage():
         sql1 = "DELETE FROM Dishes WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql1)
         db.commit()
-        print(sql1)
-
-        # 删除OrdersDishes的
-        sql3 = "DELETE FROM OrdersDishes WHERE OrderNumber in (select Orders.OrderID from Orders where Orders.ShopID = '{}')".format(RESTName)
-        cursor.execute(sql3)
-        db.commit()
-        print(sql3)
-
-        # 删除restaurant的
-        sql5 = "DELETE FROM Comments WHERE OrderID in (select Orders.OrderID from Orders where Orders.ShopID = '{}')".format(RESTName)
-        cursor.execute(sql5)
-        db.commit()
-        print(sql5)
-
         # 删除订单表里的
         sql2 = "DELETE FROM Orders WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql2)
         db.commit()
-        print(sql2)
 
-        # 删除restaurant的
+        # 删除shop的
         sql4 = "DELETE FROM Shop WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql4)
         db.commit()
@@ -334,8 +319,6 @@ def adminRestListPage():
 
         return render_template('adminRestList.html', username=username, messages=msg)
 
-
-
 #管理员查看用户信息
 @app.route('/adminUserList', methods=['GET', 'POST'])
 def adminUserPage():
@@ -343,7 +326,7 @@ def adminUserPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -374,7 +357,7 @@ def adminOrder():
         new_status = request.form['new_status']
 
         # 连接数据库
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         try:
             with db.cursor() as cursor:
                 # 更新数据库
@@ -395,7 +378,7 @@ def adminOrder():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -418,9 +401,10 @@ def adminOrder():
             return render_template('adminOrderList.html', username=username, messages=msg)
 
 
-# 管理员查看评论列表
-@app.route('/adminCommentList', methods=['GET', 'POST'])
-def adminCommentPage():
+
+#管理员查看用户信息
+@app.route('/adminUserList', methods=['GET', 'POST'])
+def adminUserPage():
     msg = ""
     if request.method == 'GET':
         msg = ""
@@ -455,7 +439,7 @@ def UserRestListPage():
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
@@ -869,7 +853,7 @@ def OrderPage():
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appdb")
         except:
             print("Error: unable to use database!")
 
@@ -909,9 +893,6 @@ def OrderPage():
             orderdishes_res.append(od_list)
         print(f"订单菜品新列表：{orderdishes_res}")
 
-
-        print(f"展示订单的菜品图片，此处为调试语句{len(orderdishes_median)}")
-
         if len(unfinished_res) and len(finished_res) and len(pending_refund_res) and len(orderdishes_median):
             msg = "done"
             print(msg)
@@ -928,28 +909,15 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
-                                   orderdishes_result=orderdishes_median,
+                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
 
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 0 " % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('OrderPage.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=len(res))
-        else:
-            print("NULL")
-            msg = "none"
-        return render_template('OrderPage.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
+    # 确认收货
     elif request.form["action"] == "确认收货":
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appdb")
         except:
             print("Error: unable to use database!")
         print("用户要确认收货啦")
@@ -983,6 +951,18 @@ def OrderPage():
         pending_refund_num = len(pending_refund_res)
         print(f"已完成订单数量{pending_refund_num}")
 
+        # 展示订单的菜品图片
+        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
+        cursor.execute(orderdishes_sql)
+        orderdishes_median = cursor.fetchall()
+        print(orderdishes_median)
+        orderdishes_res = []
+        for od in orderdishes_median:
+            od_list = list(od)
+            od_list[2] = "static/images/" + od_list[2]
+            orderdishes_res.append(od_list)
+        print(f"订单菜品新列表：{orderdishes_res}")
+
         if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
             msg = "done"
             print(msg)
@@ -990,6 +970,7 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
         else:
             print("NULL")
@@ -998,6 +979,7 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
     # 跳转到写评价页面
     elif request.form["action"] == '去评价':
@@ -1010,7 +992,7 @@ def OrderPage():
         db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appdb")
         except:
             print("Error: unable to use database!")
         print("用户要申请退款")
@@ -1047,6 +1029,18 @@ def OrderPage():
         pending_refund_num = len(pending_refund_res)
         print(f"已完成订单数量{pending_refund_num}")
 
+        # 展示订单的菜品图片
+        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
+        cursor.execute(orderdishes_sql)
+        orderdishes_median = cursor.fetchall()
+        print(orderdishes_median)
+        orderdishes_res = []
+        for od in orderdishes_median:
+            od_list = list(od)
+            od_list[2] = "static/images/" + od_list[2]
+            orderdishes_res.append(od_list)
+        print(f"订单菜品新列表：{orderdishes_res}")
+
         if len(unfinished_res) and len(finished_res) and len(pending_refund_res):
             msg = "done"
             print(msg)
@@ -1054,6 +1048,7 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
         else:
             print("NULL")
@@ -1062,6 +1057,7 @@ def OrderPage():
                                    unfinished_result=unfinished_res, finished_result=finished_res,
                                    pendingRefund_result=pending_refund_res, pendingRefundNum=pending_refund_num,
                                    notFinishedNum=notFinished_num, finishedNum=finished_num,
+                                   orderdishes_result=orderdishes_res,
                                    messages=msg)
 
 
@@ -1108,8 +1104,8 @@ def MyCommentsPage():
         cursor.execute(sql)
         res = cursor.fetchall()
         print(res)
-        # print(len(res))
-        if len(res) != 0:
+        print(len(res))
+        if len(res):
             msg = "done"
             print(msg)
             return render_template('MyComments.html', username=username, result=res, messages=msg,
@@ -1172,43 +1168,115 @@ def MyCommentsPage():
 # 写评论页面
 @app.route('/WriteComments', methods=['GET', 'POST'])
 def WriteCommentsPage():
-    msg=""
+    msg = ""
+    # 显示未评价订单
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appdb")
         except:
             print("Error: unable to use database!")
-        # 查询未完成订单
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND (status = 1 or status = 2 or status = 3 or status = 4)" % username
-        cursor.execute(unfinished_sql)
-        unfinished_res = cursor.fetchall()
-        print(unfinished_res)
-        notFinished_num = len(unfinished_res)
-        print(f"未完成订单数量{notFinished_num}")
-        if len(unfinished_res):
+        # 查询未评价订单，即orders.status in (5, 7 ,8) and comments.description is null
+        uncommented_sql = """select * 
+                                from orders o 
+                            where 
+                                o.OrderID not in (select c.OrderID from comments c) 
+                                and o.Status in (5, 7, 8) 
+                                and o.userID = %s""" % username
+        cursor.execute(uncommented_sql)
+        uncommented_res = cursor.fetchall()
+        print(uncommented_res)
+        uncommented_num = len(uncommented_res)
+        print(f"未评价订单数量：{uncommented_num}")
+
+        # 展示订单的菜品图片
+        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
+        cursor.execute(orderdishes_sql)
+        orderdishes_median = cursor.fetchall()
+        print(orderdishes_median)
+        orderdishes_res = []
+        for od in orderdishes_median:
+            od_list = list(od)
+            od_list[2] = "static/images/" + od_list[2]
+            orderdishes_res.append(od_list)
+        print(f"订单菜品新列表：{orderdishes_res}")
+
+        if len(uncommented_res):
             msg = "done"
             print(msg)
             return render_template('WriteComments.html', username=username,
-                                   unfinished_result=unfinished_res, messages=msg,
-                                   notFinishedNum=notFinished_num)
+                                   uncommented_result=uncommented_res, uncommentedNum=uncommented_num,
+                                   orderdishes_result=orderdishes_res,
+                                   messages=msg)
         else:
             print("NULL")
             msg = "none"
             return render_template('WriteComments.html', username=username,
-                                   unfinished_result=unfinished_res, messages=msg,
-                                   notFinishedNum=notFinished_num)
+                                   uncommented_result=uncommented_res, uncommentedNum=uncommented_num,
+                                   orderdishes_result=orderdishes_res,
+                                   messages=msg)
+    # 提交评论
     elif request.method == 'POST':
-        comment = request.form['comment']
-        # 第一，WriteComments中使用for循环来展示订单，导致评论只输入一个，待评价的订单就没了
-        # 第二，修改orders的stastu状态为已评价
-        print(comment)
-        return render_template('WriteComments.html', username=username, messages=msg)
-    else:
-        return render_template('WriteComments.html', username=username, messages=msg)
+        comment_container = request.form.get("comment")
+        print(comment_container)
+        # 将评价内容插入comments表
+        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+        # 获取当前orderID
+        orderID = request.form.get("orderID")
+        print(f"orderID:{orderID}")
+        comment_sql = "insert into comments value (%s, %s, %s, CURDATE())"
+        print(comment_sql)
+        cursor.execute(comment_sql, (orderID, username, comment_container))
+        db.commit()
+        print("commit")
+
+        # 重新展示页面订单
+        uncommented_sql = """select * 
+                                        from orders o 
+                                    where 
+                                        o.OrderID not in (select c.OrderID from comments c) 
+                                        and o.Status in (5, 7, 8) 
+                                        and o.userID = %s""" % username
+        cursor.execute(uncommented_sql)
+        uncommented_res = cursor.fetchall()
+        print(uncommented_res)
+        uncommented_num = len(uncommented_res)
+        print(f"未评价订单数量：{uncommented_num}")
+
+        # 展示订单的菜品图片
+        orderdishes_sql = "select od.* from orders o join ordersdishes od on o. OrderID = od.OrderNumber where o.UserID = %s" % username
+        cursor.execute(orderdishes_sql)
+        orderdishes_median = cursor.fetchall()
+        print(orderdishes_median)
+        orderdishes_res = []
+        for od in orderdishes_median:
+            od_list = list(od)
+            od_list[2] = "static/images/" + od_list[2]
+            orderdishes_res.append(od_list)
+        print(f"订单菜品新列表：{orderdishes_res}")
+
+        if len(uncommented_res):
+            msg = "done"
+            print(msg)
+            return render_template('WriteComments.html', username=username,
+                                   uncommented_result=uncommented_res, uncommentedNum=uncommented_num,
+                                   orderdishes_result=orderdishes_res,
+                                   messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('WriteComments.html', username=username,
+                                   uncommented_result=uncommented_res, uncommentedNum=uncommented_num,
+                                   orderdishes_result=orderdishes_res,
+                                   messages=msg)
 
 
 # 用户评论页面
