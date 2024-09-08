@@ -298,17 +298,32 @@ def adminRestListPage():
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
-        # TODO: 点击移除后显示移除成功，但数据库里没有删掉
+            # TODO: 点击移除后显示移除成功，但数据库里没有删掉
         # 删除DISHES的
         sql1 = "DELETE FROM Dishes WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql1)
         db.commit()
+        print(sql1)
+
+        # 删除OrdersDishes的
+        sql3 = "DELETE FROM OrdersDishes WHERE OrderNumber in (select Orders.OrderID from Orders where Orders.ShopID = '{}')".format(RESTName)
+        cursor.execute(sql3)
+        db.commit()
+        print(sql3)
+
+        # 删除restaurant的
+        sql5 = "DELETE FROM Comments WHERE OrderID in (select Orders.OrderID from Orders where Orders.ShopID = '{}')".format(RESTName)
+        cursor.execute(sql5)
+        db.commit()
+        print(sql5)
+
         # 删除订单表里的
         sql2 = "DELETE FROM Orders WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql2)
         db.commit()
+        print(sql2)
 
-        # 删除shop的
+        # 删除restaurant的
         sql4 = "DELETE FROM Shop WHERE ShopID = '{}'".format(RESTName)
         cursor.execute(sql4)
         db.commit()
@@ -318,6 +333,8 @@ def adminRestListPage():
         print(msg)
 
         return render_template('adminRestList.html', username=username, messages=msg)
+
+
 
 #管理员查看用户信息
 @app.route('/adminUserList', methods=['GET', 'POST'])
@@ -572,7 +589,7 @@ def resComment():
         except:
             print("Error: unable to use database!")
         # 查询
-        sql = "SELECT * FROM ORDER_COMMENT WHERE restaurant = '%s' AND isFinished = 1 AND text <> '' "% restaurant
+        sql = "SELECT Orders.OrderID,Orders.ShopID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime,users.UserID FROM Orders join Comments on Comments.OrderID=Orders.OrderID join Users on Users.UserID=orders.UserID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,7,8) AND Comments.Description <> '' " % restaurant
         cursor.execute(sql)
         res = cursor.fetchall()
         # print(res)
@@ -601,7 +618,7 @@ def ResCommentList():
     except:
         print("Error: unable to use database!")
     # 查询
-    sql = "SELECT Orders.OrderID,Orders.UserID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,7,8) AND Comments.Description <> '' " % restaurant
+    sql = "SELECT Orders.OrderID,Orders.ShopID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime,users.UserID FROM Orders join Comments on Comments.OrderID=Orders.OrderID join Users on Users.UserID=orders.UserID WHERE Orders.ShopID = '%s' AND Orders.Status in(5,7,8) AND Comments.Description <> '' " % restaurant
     cursor.execute(sql)
     res = cursor.fetchall()
     # print(res)
@@ -1091,8 +1108,8 @@ def MyCommentsPage():
         cursor.execute(sql)
         res = cursor.fetchall()
         print(res)
-        print(len(res))
-        if len(res):
+        # print(len(res))
+        if len(res) != 0:
             msg = "done"
             print(msg)
             return render_template('MyComments.html', username=username, result=res, messages=msg,

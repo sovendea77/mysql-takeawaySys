@@ -55,6 +55,58 @@
 			</nav>
 		</div>
 
+	<div class="gtco-section">
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2 text-center gtco-heading">
+					<h2 class="cursive-font primary-color">外卖员信息</h2>
+				</div>
+			</div>
+			<div >
+				{% if messages == "done" %}
+				<table>
+    <thead>
+        <tr>
+            <th style="width:200px;">外卖员姓名</th>
+			<th style="width:200px;">密码</th>
+            <th style="width:400px;">联系电话</th>
+            <th style="width:200px;">位置信息</th>
+			<th style="width:200px;">是否已送达</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in result %}
+        <tr>
+            <td style="width:200px;">
+                {{ item[0] }}
+            </td>
+            <td style="width:400px;">
+                {{ item[1] }}
+            </td>
+            <td style="width:200px;">
+                {{ item[2] }}
+            </td>
+            <td style="width:200px;">
+                {{ item[3] }}
+            </td>
+
+			{% if item[4] == 1 %}
+			<td style="width:200px;"> 是 </td>
+			{% else %}
+			<td style="width:200px;"> 否 </td>
+			{% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+				{% endif %}
+
+
+
+
+			</div>
+
+		</div>
 	</div>
 	<!-- jQuery -->
 	<script src="static/js/jquery.min.js"></script>
