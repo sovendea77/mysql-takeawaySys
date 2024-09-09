@@ -260,6 +260,63 @@ def logInPage():
                 msg = "fail4"
             return render_template('logIn.html', messages=msg, username=username, userRole=userRole)
 
+# 管理员查看评论列表
+@app.route('/adminCommentList', methods=['GET', 'POST'])
+def adminCommentPage():
+    msg = ""
+    if request.method == 'GET':
+        msg = ""
+        # 连接数据库，默认数据库用户名root，密码空
+        db = pymysql.connect(host="localhost", user="root", password="123456", database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        # 查询
+        sql = "SELECT Orders.OrderID,Orders.UserID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.Status in(5,7,8) AND Comments.Description <> ''"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        # print(res)
+        # print(len(res))
+        if len(res) != 0:
+            msg = "done"
+            print(msg)
+            return render_template('adminCommentList.html', username=username, result=res, messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('adminCommentList.html', username=username, messages=msg)
+
+#管理员查看外卖员信息
+@app.route('/adminDeliList', methods=['GET', 'POST'])
+def adminDeliList():
+    msg = ""
+    if request.method == 'GET':
+        msg = ""
+        # 连接数据库，默认数据库用户名root，密码空
+        db = pymysql.connect(host="localhost", user="root", password="123456", database="appDB", charset='utf8')
+        cursor = db.cursor()
+        try:
+            cursor.execute("use appDB")
+        except:
+            print("Error: unable to use database!")
+
+        # 查询
+        sql = "SELECT * FROM DeliveryPersons"
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        # print(res)
+        # print(len(res))
+        if len(res) != 0:
+            msg = "done"
+            print(msg)
+            return render_template('adminDeliList.html', username=username, result=res, messages=msg)
+        else:
+            print("NULL")
+            msg = "none"
+            return render_template('adminDeliList.html', username=username, messages=msg)
 
 # 管理员的店铺列表页面
 @app.route('/adminRestList', methods=['GET', 'POST'])
@@ -352,29 +409,7 @@ def adminUserPage():
 @app.route('/adminOrderList', methods=['GET', 'POST'])
 def adminOrder():
     msg = ""
-    if request.method == 'POST':
-        order_id = request.form['order_id']
-        new_status = request.form['new_status']
 
-        # 连接数据库
-        db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
-        try:
-            with db.cursor() as cursor:
-                # 更新数据库
-                sql = "UPDATE RESTAURANT SET password = %s WHERE username = %s"  # 假设你的表名是ORDERS，字段是status和id
-                cursor.execute(sql, (new_status, order_id))
-
-            db.commit()
-            msg = "Order status updated successfully!"
-
-        except pymysql.MySQLError as e:
-            print(f"Error: {e}")
-            msg = "Error updating order status!"
-
-        finally:
-            db.close()
-
-        return redirect(url_for('adminOrder'))
     if request.method == 'GET':
         msg = ""
         # 连接数据库，默认数据库用户名root，密码空
@@ -1101,105 +1136,31 @@ def OrderPage():
 @app.route('/MyComments', methods=['GET', 'POST'])
 def MyCommentsPage():
     msg = ""
-    global notFinishedNum
     if request.method == 'GET':
         msg = ""
+
         # 连接数据库，默认数据库用户名root，密码空
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
+        db = pymysql.connect(host="localhost", user="root", password="123456", database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
             cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
-        # 查询已完成订单(此处未改)
-        unfinished_sql = "SELECT * FROM orders WHERE userID = '%s' AND status != 5 and status != 7 and status != 8" % username
-        cursor.execute(unfinished_sql)
-        unfinished_res = cursor.fetchall()
-        print(unfinished_res)
-        notFinished_num = len(unfinished_res)
-        print(f"未完成订单数量{notFinished_num}")
-        if len(unfinished_res):
+
+        # 查询
+        sql = "SELECT Orders.OrderID,Orders.UserID,Orders.Status,Orders.OrderTotalPrice,Comments.Description,transactiontime FROM Orders join Comments on Comments.OrderID=Orders.OrderID WHERE Orders.UserID = '%s' AND Orders.Status in(5,7,8) AND Comments.Description <> '' " % username
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        print(res)
+        # print(len(res))
+        if len(res) != 0:
             msg = "done"
             print(msg)
-            return render_template('MyComments.html', username=username,
-                                   unfinished_result=unfinished_res, messages=msg,
-                                   notFinishedNum=notFinished_num)
+            return render_template('MyComments.html', username=username, result=res, messages=msg)
         else:
             print("NULL")
             msg = "none"
             return render_template('MyComments.html', username=username, messages=msg)
-    elif request.form["action"] == "按时间排序":
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
-
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text is not null Order BY transactiontime DESC" % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('MyComments.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
-        else:
-            print("NULL")
-            msg = "none"
-        return render_template('MyComments.html', username=username, messages=msg)
-    elif request.form["action"] == "按价格排序":
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
-
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text is not null Order BY cost ASC" % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('MyComments.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=notFinishedNum)
-        else:
-            print("NULL")
-            msg = "none"
-        return render_template('MyComments.html', username=username, messages=msg, notFinishedNum=notFinishedNum)
-    elif request.form["action"] == "待评价订单":
-        # 未评价订单跳转到写评论中
-        db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
-        cursor = db.cursor()
-        try:
-            cursor.execute("use appDB")
-        except:
-            print("Error: unable to use database!")
-
-        sql = "SELECT * FROM ORDER_COMMENT WHERE username = '%s' AND isFinished = 1 AND text = '' " % username
-        cursor.execute(sql)
-        res = cursor.fetchall()
-        print(res)
-        print("MyCommentsPage - 未评价订单: {}".format(len(res)))
-        print(len(res))
-        if len(res):
-            msg = "done"
-            print(msg)
-            return render_template('WriteComments.html', username=username, result=res, messages=msg,
-                                   notFinishedNum=len(res))
-        else:
-            print("MyCommentsPage - 待评价订单 - NULL")
-            msg = "none"
-            return render_template('WriteComments.html', username=username, messages=msg, notFinishedNum=len(res))
-
-    else:
-        return render_template('MyComments.html', username=username, messages=msg)
-
 
 # 写评论页面
 @app.route('/WriteComments', methods=['GET', 'POST'])
@@ -1623,7 +1584,7 @@ def DPIndexPage():
             msg = "none"
             return render_template('DPIndex.html', username=username, messages=msg)
 
-    elif request.method == 'POST' and request.form.get("action") == "订单送达":
+    elif request.method == 'POST' and request.form.get("action") == "确认送达":
         db = pymysql.connect(host="localhost", user=user_name, password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:

@@ -73,10 +73,9 @@
 									<p style="margin-top: -20px;">用户：{{ item[5] }}</p>
 
 									{% if item[9] is none %}
-										<p style="margin-top: -5px;">取餐时间：{{ item[10] }}</p>
 										<p style="margin-top: -5px;">订单状态：<span style="color: red;">未完成</span></p>
 									{% elif item[9] is not none %}
-										<p style="margin-top: -5px;">取餐时间：{{ item[10] }}</p>
+										<p style="margin-top: -5px;">用户取餐时间：{{ item[10] }}</p>
 										<p style="margin-top: -5px;">订单状态：<span style="color: red;">已完成</span></p>
 									{% endif %}
 
@@ -86,7 +85,7 @@
 									<form action="{{ url_for('DPIndexPage') }}" method="post">
 										<input name="orderID" value={{ item[0] }} style="display: none;">
 										{% if item[9] is none %}
-                                            <input type="submit" name="action" value="订单送达" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
+                                            <input type="submit" name="action" value="确认送达" style="margin: 15px; font-size: 16px; float: right; color: #FBB448; background-color: white; font-size: 16px; outline:none; border: 1px solid #FBB448; border-radius: 10px;">
                                         {% endif %}
 									</form>
                                     <br/>
@@ -96,7 +95,6 @@
 					<!-- TODO -->
 					{% elif messages == "UpdateSucceed" %}
 					<script>alert("确认订单送达！")</script>
-					<script type='text/javascript'>window.location.href='WriteComments'</script>
 
 
 					{% elif messages == "none" %}
@@ -162,6 +160,7 @@
 
 	<!-- Main -->
 	<script src="static/js/main.js"></script>
+	</div>
 </body>
 
 </html>
