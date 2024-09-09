@@ -94,20 +94,31 @@
 						{% for item in result %}
 							<!-- <div class="fh5co-card-item"> -->
 							<div class="fh5co-card-item">
-								<!-- <figure class="col-lg-4" style="float: left; position: relative;">
-									<div class="overlay"></div>
-									<img src={{item[8]}} alt="Image" class="img-responsive">
-								</figure> -->
+
 								<div class="fh5co-text" style="float: left ;padding: 20px; text-align: left;">
-									<!-- <h2 style="margin-top: 40px;">  </h2> -->
+
+									{% for od in orderdishes_result %}
+										{% if od[0] == item[0] %}
+											<img src="{{ od[2] }}" alt="菜品图片" width="200" height="150">
+											<p>数量：{{ od[3] }}</p>
+										{% endif %}
+									{% endfor %}
+
 									<p>订单号：{{ item[0] }}</p>
 									<p>商家：{{ item[1] }}</p>
-									<p>订单状态：{{ item[2] }}</p>
+									{% if item[2] == 5 %}
+										<p>订单状态：已完成</p>
+									{% elif item[2] == 7 %}
+										<p>订单状态：用户申请退款，且退款成功</p>
+									{% elif item[2] == 8 %}
+										<p>订单状态：用户申请退款，但退款失败</p>
+									{% endif %}
 									<p>金额：{{ item[3] }}</p>
 									<p>评价内容：{{ item[4] }}</p>
 									<p>评论时间：{{ item[5] }}</p>
 
 								</div>
+
 								<div class="fh5co-text" style="padding: 20px; float: left; margin-left: 100px;">
 									<i class="ti-quote-left" style="font-size: 20px;"></i>
 								</div>
