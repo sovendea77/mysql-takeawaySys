@@ -25,9 +25,8 @@
 	<!-- Owl Carousel  -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
-	
-
 </head>
+
 <body>
 	<div class="navbkg" >
     <nav class="gtco-nav" role="navigation" style="background-color: rgba(0, 0, 0, 0.8);">
@@ -50,11 +49,11 @@
                             </ul>
 						</li>
 						<li><a href="index">返回首页</a></li>
-                    </ul>	
+                    </ul>
                 </div>
             </div>
         </div>
-	</nav>  
+	</nav>
 	</div>
 
 	<div class="gtco-section">
@@ -75,32 +74,34 @@
 			    <ul>
 					{% if uncommented_result %}
 			        {% for order in uncommented_result %}
-			        <li>
-			            <div class="order-details">
-									{% for od in orderdishes_result %}
-										{% if od[0] == order[0] %}
-											<img src="{{ od[2] }}" alt="菜品图片" width="200" height="150">
-											<p>数量：{{ od[3] }}</p>
-										{% endif %}
-									{% endfor %}
+					<div style="border: 2px solid blue;">
+			    	    <li>
+			    	        <div class="order-details">
+										{% for od in orderdishes_result %}
+											{% if od[0] == order[0] %}
+												<img src="{{ od[2] }}" alt="菜品图片" width="200" height="150">
+												<p>数量：{{ od[3] }}</p>
+											{% endif %}
+										{% endfor %}
 
-			    	    	        <p>订单号：{{ order[0] }}</p>
-									<p>下单时间：{{ order[1] }}</p>
-									<p>商家ID：{{ order[4] }}</p>
-					    	        <p>总价：{{ order[2] }} 元</p>
-						</div>
+			    		    	        <p>订单号：{{ order[0] }}</p>
+										<p>下单时间：{{ order[1] }}</p>
+										<p>商家ID：{{ order[4] }}</p>
+						    	        <p>总价：{{ order[2] }} 元</p>
+							</div>
 
-						<form action="" method="post">
-							<input type="hidden" name="orderID" value="{{order[0]}}">
-    						<!-- 文本域，用于输入评论内容 -->
-    						<textarea name="comment" rows="4" cols="50" placeholder="在这里写下您的评论..."></textarea><br><br>
-    						<!-- 提交按钮 -->
-    						<input type="submit" value="提交">
-						</form>
-			        </li>
+							<form action="" method="post">
+								<input type="hidden" name="orderID" value="{{order[0]}}">
+    							<!-- 文本域，用于输入评论内容 -->
+    							<textarea name="comment" rows="4" cols="50" placeholder="在这里写下您的评论..."></textarea><br><br>
+    							<!-- 提交按钮 -->
+    							<input type="submit" value="提交">
+							</form>
+			    	    </li>
+					</div>
 			        {% endfor %}
 					{% else %}
-					    <li>没有需要评价的订单。</li>
+					    <li>没有需要评价的订单</li>
 					{% endif %}
 			    </ul>
 			    </div>

@@ -68,11 +68,11 @@
                             </ul>
 						</li>
 						<li><a href="index">返回首页</a></li>
-                    </ul>	
+                    </ul>
                 </div>
             </div>
         </div>
-	</nav>  
+	</nav>
 	</div>
 
 	<div class="gtco-section">
@@ -89,32 +89,53 @@
 
 			<!-- 展示我的全部订单 -->
 			<div class="row">
-				<div class="orders-list">
-			    <h2>未完成订单：{{ notFinishedNum }}</h2>
-			    <ul>
-					{% if unfinished_result %}
-			        {% for order in unfinished_result %}
-			        <li>
-			            <div class="order-details">
-			                <p>订单号：{{ order[0] }}</p>
-							<p>下单时间：{{ order[1] }}</p>
-							<p>商家ID：{{ order[0] }}</p>
-							<p>总价：{{ order[2] }} 元</p>
-			            </div>
-						<form action="submit_comment.php" method="post">
-    						<!-- 文本域，用于输入评论内容 -->
-    						<textarea name="comment" rows="4" cols="50" placeholder="在这里写下您的评论..."></textarea><br><br>
-    						<!-- 提交按钮 -->
-    						<input type="submit" value="提交">
-						</form>
+				<div class="col-lg-12 col-md-4 col-sm-6">
+					{% if messages == "done" %}
+						{% for item in result %}
+							<!-- <div class="fh5co-card-item"> -->
+							<div class="fh5co-card-item">
 
-			        </li>
-			        {% endfor %}
-					{% else %}
-					    <li>没有已完成的订单。</li>
+								<div class="fh5co-text" style="float: left ;padding: 20px; text-align: left;">
+
+									{% for od in orderdishes_result %}
+										{% if od[0] == item[0] %}
+											<img src="{{ od[2] }}" alt="菜品图片" width="200" height="150">
+											<p>数量：{{ od[3] }}</p>
+										{% endif %}
+									{% endfor %}
+
+									<p>订单号：{{ item[0] }}</p>
+									<p>商家：{{ item[1] }}</p>
+									{% if item[2] == 5 %}
+										<p>订单状态：已完成</p>
+									{% elif item[2] == 7 %}
+										<p>订单状态：用户申请退款，且退款成功</p>
+									{% elif item[2] == 8 %}
+										<p>订单状态：用户申请退款，但退款失败</p>
+									{% endif %}
+									<p>金额：{{ item[3] }}</p>
+									<p>评价内容：{{ item[4] }}</p>
+									<p>评论时间：{{ item[5] }}</p>
+
+								</div>
+
+								<div class="fh5co-text" style="padding: 20px; float: left; margin-left: 100px;">
+									<i class="ti-quote-left" style="font-size: 20px;"></i>
+								</div>
+
+								<div class="fh5co-text" style="padding: 20px; float: right; margin-right: 20px;">
+									<i class="ti-quote-right" style="font-size: 20px;"></i>
+								</div>
+							</div>
+							<!-- </div> -->
+						{% endfor %}
+
+					{% elif messages == "none" %}
+						<!-- <p style="text-align: center;"><strong style="font-size: 18px;">您还没有订单哦！</strong></p> -->
+						<div class="alert alert-danger" role="alert">暂无已评价订单！</div>
 					{% endif %}
-			    </ul>
-			    </div>
+
+				</div>
 
 			</div>
 		</div>
@@ -142,7 +163,7 @@
 	<!-- Magnific Popup -->
 	<script src="static/js/jquery.magnific-popup.min.js"></script>
 	<script src="static/js/magnific-popup-options.js"></script>
-	
+
 	<script src="static/js/moment.min.js"></script>
 	<script src="static/js/bootstrap-datetimepicker.min.js"></script>
 
