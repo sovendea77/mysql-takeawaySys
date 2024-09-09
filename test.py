@@ -33,7 +33,7 @@ def OrderPage():
         db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
 
@@ -112,7 +112,7 @@ def OrderPage():
         db = pymysql.connect(host="localhost", user="root", password=pwd, database="appDB", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
         print("用户要确认收货啦")
@@ -187,7 +187,7 @@ def OrderPage():
         db = pymysql.connect(host="localhost", user="root", password='0158', database="test2", charset='utf8')
         cursor = db.cursor()
         try:
-            cursor.execute("use test2")
+            cursor.execute("use appDB")
         except:
             print("Error: unable to use database!")
         print("用户要申请退款")
